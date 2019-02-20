@@ -1,0 +1,4 @@
+{
+    "name": "Scraper Service Backend - Development",
+    "whitelist": "http://localhost:3000"
+}
