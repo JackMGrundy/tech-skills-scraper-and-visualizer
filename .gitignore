@@ -89,7 +89,6 @@ backend/.dynamodb/
 # End of https://www.gitignore.io/api/node
 
 
-
 ########### Frontend ################
 # dependencies
 frontend/react-app/node_modules
