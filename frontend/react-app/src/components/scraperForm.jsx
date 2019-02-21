@@ -3,7 +3,7 @@ import InputList from "./inputList.jsx";
 import http from "../services/httpService";
 import config from "../config.json";
 import { toast } from "react-toastify";
-import TitledInputList from "./titledInputList";
+import ListAliasedInputs from "./listAliasedInputs"
 
 class ScraperForm extends Component {
   state = {
@@ -35,18 +35,22 @@ class ScraperForm extends Component {
     const job = this.state;
 
     return (
-      <div>
-        <h3 className="mt-5">Job title</h3>
-        <TitledInputList />
-        <p></p>
-        <p></p>
+      <ListAliasedInputs>
 
-        <h3 className="mt-5">Skills</h3>
-        <TitledInputList />
-        <button onClick={this.handlePost} className="btn-lg btn-primary mt-5">
-          Submit job
-        </button>
-      </div>
+      </ListAliasedInputs>
+
+      // <div>
+      //   <h3 className="mt-5">Job title</h3>
+      //   <TitledInputList />
+      //   <p></p>
+      //   <p></p>
+
+      //   <h3 className="mt-5">Skills</h3>
+      //   <TitledInputList />
+      //   <button onClick={this.handlePost} className="btn-lg btn-primary mt-5">
+      //     Submit job
+      //   </button>
+      // </div>
     );
   }
 }

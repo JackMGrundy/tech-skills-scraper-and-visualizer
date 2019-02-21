@@ -1,18 +1,20 @@
 import React, { Component } from "react";
 
-const Input = ({ name, label, value, onChange, sizeClass }) => {
+const Input = ({ name, label, value, onChange, size, margin }) => {
   return (
     <div className="form-group">
-      <label className="ml-5 mt-4" htmlFor={name}>
+      <label className={"mt-4 " + margin} htmlFor={name}>
         {label}
       </label>
       <input
+        name={name}
         autoComplete="off"
+        autoCorrect="off"
+        spellCheck="false"
         value={value}
         onChange={onChange}
-        id={name}
         type="text"
-        className={"form-control " + sizeClass}
+        className={"form-control " + size + " " + margin}
       />
     </div>
   );
