@@ -3,6 +3,7 @@ import http from "../services/httpService";
 import config from "../config.json";
 import { toast } from "react-toastify";
 import AliasedInput from "./aliasedInput.jsx";
+import SkillsGrid from "./skillsGrid";
 const shortid = require("shortid");
 
 class ScraperForm extends Component {
@@ -53,20 +54,20 @@ class ScraperForm extends Component {
     this.setState({ skills });
   };
 
-  handleDelete = key => {
+  handleDelete = id => {
     const skills = { ...this.state.skills };
-    delete skills[key];
+    delete skills[id];
     this.setState({ skills });
   };
 
-  handleClear = key => {
+  handleClear = id => {
     const skills = { ...this.state.skills };
-    skills[key].title = "";
-    skills[key].aliases = [];
+    skills[id].title = "";
+    skills[id].aliases = [];
     this.setState({ skills });
   };
 
-  handleCreate = ({ currentTarget: input }) => {
+  handleCreate = () => {
     const id = shortid.generate();
     let skills = { ...this.state.skills };
     skills[id] = { title: "", aliases: [] };
@@ -89,36 +90,14 @@ class ScraperForm extends Component {
         />
         <div>
           <h3 className="mt-5">Skills</h3>
-          {Object.keys(skills).map(key => (
-            <div key={"div-" + key}>
-              <div key={key}>
-                <AliasedInput
-                  titleLabel="Skill"
-                  name={key}
-                  title={skills[key].title}
-                  aliases={skills[key].aliases}
-                  handleTitleChange={this.handleSkillTitleChange}
-                  handleAliasChange={this.handleSkillAliasChange}
-                />
-              </div>
-              <button
-                key={"btn-del" + key}
-                onClick={() => {
-                  this.handleDelete(key);
-                }}
-                className="btn-sm btn-danger mt-0 ml-1"
-              >
-                -
-              </button>
-              <button
-                key={"btn-clear-" + key}
-                onClick={() => this.handleClear(key)}
-                className="btn-sm btn-warning mt-3 ml-2"
-              >
-                Clear
-              </button>
-            </div>
-          ))}
+          <SkillsGrid
+            skills={skills}
+            handleSkillTitleChange={this.handleSkillTitleChange}
+            handleSkillAliasChange={this.handleSkillAliasChange}
+            handleDelete={this.handleDelete}
+            handleClear={this.handleClear}
+            numCols={3}
+          />
           <button
             onClick={this.handleCreate}
             className="btn-lg btn-success mt-3"
