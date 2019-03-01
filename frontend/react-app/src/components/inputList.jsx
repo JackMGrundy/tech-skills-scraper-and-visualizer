@@ -10,21 +10,20 @@ class InputList extends Component {
   };
 
   componentDidMount() {
-    const { id, name } = this.props;
-    this.setState({ name: name, id: id });
+    // const { id, name } = this.props;
+    // this.setState({ name: name, id: id });
   }
 
   handleClear = () => {
-    const { name, id } = this.state;
-    const { helperFunctions } = this.props;
+    // const { name, id } = this.state;
+    const { name, id, helperFunctions } = this.props;
 
     let obj = { currentTarget: { name: name, value: "" } };
     helperFunctions.handleChange(obj, id);
   };
 
   handleDelete = val => {
-    const { name, id } = this.state;
-    const { values, helperFunctions } = this.props;
+    const { name, id, values, helperFunctions } = this.props;
 
     let newValues = values.split(",");
     newValues = newValues.map(Function.prototype.call, String.prototype.trim);
@@ -42,8 +41,8 @@ class InputList extends Component {
   };
 
   handleCreate = e => {
-    const { name, id, newValue } = this.state;
-    const { values, helperFunctions } = this.props;
+    const { newValue } = this.state;
+    const { name, id, values, helperFunctions } = this.props;
     let newValues =
       values == "" ? newValue.trim() : values + "," + newValue.trim();
 
@@ -60,6 +59,7 @@ class InputList extends Component {
 
   render() {
     const { values, id, helperFunctions } = this.props;
+    const { newValue } = this.state;
     return (
       <div>
         <Popup
@@ -132,7 +132,7 @@ class InputList extends Component {
                 type="text"
                 className="form-control"
                 placeholder="Input alias"
-                value={this.state.newValue}
+                value={newValue}
                 onChange={this.handleChange}
                 onKeyPress={this.onKeyPress}
               />

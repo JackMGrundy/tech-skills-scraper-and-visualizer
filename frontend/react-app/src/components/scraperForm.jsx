@@ -35,13 +35,13 @@ class ScraperForm extends Component {
 
   handleChange = (e, id = null) => {
     const { name, value } = e.currentTarget;
-
-    // console.log("name ", name, " value ", value, " id ", id);
+    console.log("current ids ", this.state.aliases);
+    console.log("Updating name ", name, " value ", value, " id ", id);
     if (id === null) {
-      // console.log("updating based on just name")
+      console.log("updating based on just name")
       this.setState({ [name]: value });
     } else {
-      // console.log("updating based on name and id");
+      console.log("updating based on name and id");
       let temp = this.state[name];
       temp[id] = value;
       this.setState({ [name]: temp });
@@ -58,6 +58,7 @@ class ScraperForm extends Component {
   };
 
   handleDeleteSkill = (id) => {
+    console.log("deleting id ", id);
     let skills = { ...this.state.skills };
     let aliases = { ...this.state.aliases };
     delete skills[id];

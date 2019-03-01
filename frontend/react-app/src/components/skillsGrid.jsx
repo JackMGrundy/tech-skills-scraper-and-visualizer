@@ -11,6 +11,7 @@ const SkillsGrid = ({
   numCols
 }) => {
   let keys = Object.keys(skills);
+  console.log("creating grid with keys: ", keys);
   let numRows = Math.ceil(keys.length / parseFloat(numCols));
 
   let cols = [];
