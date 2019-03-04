@@ -24,7 +24,6 @@ class InputList extends Component {
 
   handleDelete = val => {
     const { name, id, values, helperFunctions } = this.props;
-
     let newValues = values.split(",");
     newValues = newValues.map(Function.prototype.call, String.prototype.trim);
     let index = newValues.indexOf(val.trim());
@@ -40,7 +39,7 @@ class InputList extends Component {
     this.setState({ newValue: input.value });
   };
 
-  handleCreate = e => {
+  handleCreate = () => {
     const { newValue } = this.state;
     const { name, id, values, helperFunctions } = this.props;
     let newValues =
@@ -58,6 +57,7 @@ class InputList extends Component {
   };
 
   render() {
+    // console.log(this);
     const { values, id, helperFunctions } = this.props;
     const { newValue } = this.state;
     return (
@@ -65,7 +65,6 @@ class InputList extends Component {
         <Popup
           trigger={
             <div>
-              {/* <span>Aliases</span><h1></h1> */}
               <button
                 onClick={this.handleClick}
                 className="btn btn-primary menu"
@@ -120,7 +119,7 @@ class InputList extends Component {
                   </button>
                   <span
                     aria-describedby="inputGroup-sizing-sm"
-                    className="list-group-item list-group-item-primary"
+                    className="list-group-item"
                   >
                     {val}
                   </span>

@@ -11,7 +11,7 @@ router.get("/", async (req, res, next) => {
 });
 
 router.post("/", async (req, res) => {
-
+  console.log("posted?");
   res.status(200).send("posted");
 
   //   Account for 200 and 400 ranges

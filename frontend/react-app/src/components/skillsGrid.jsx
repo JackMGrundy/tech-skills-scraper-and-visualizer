@@ -8,24 +8,25 @@ const SkillsGrid = ({
   skillsName,
   aliasesName,
   helperFunctions,
-  numCols
+  numCols,
+  error
 }) => {
-  let keys = Object.keys(skills);
-  console.log("creating grid with keys: ", keys);
-  let numRows = Math.ceil(keys.length / parseFloat(numCols));
+  let keys = Object.keys(skills),
+      cols = [],
+      rows = [],
+      i = 0,
+      numRows = Math.ceil(keys.length / parseFloat(numCols)),
+      index,
+      nxtKey;
+   
 
-  let cols = [];
-  let i = 0;
   while (cols.push(i++) < numCols) {}
-
-  let rows = [];
-  i = 0;
+  i=0;
   while (rows.push(i++) < numRows) {}
 
-  let index;
-  let nxtKey;
   return (
     <div className="container">
+    {error && <div className="alert alert-danger">{error}</div>}
       {rows.map(row => {
         return (
           <div key={row * row} className="row">
