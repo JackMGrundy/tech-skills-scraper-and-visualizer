@@ -9,12 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "amqp": "^0.2.7",
+    "amqplib": "^0.5.3",
     "config": "^3.0.1",
     "express": "^4.16.4",
     "express-async-errors": "^3.1.1",
     "joi": "^14.3.1",
+    "mongoose": "^5.4.17",
     "nodemon": "^1.18.10",
-    "winston": "^2.2.1"
+    "winston": "^2.4.4"
   },
   "devDependencies": {
     "jest": "^24.1.0"

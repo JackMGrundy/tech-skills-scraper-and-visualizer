@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default function (a, x) {\n  var lo = 0,\n      hi = a.length;\n\n  while (lo < hi) {\n    var mid = lo + hi >>> 1;\n    if (a[mid] < x) lo = mid + 1;else hi = mid;\n  }\n\n  return lo;\n}","map":null,"metadata":{},"sourceType":"module"}

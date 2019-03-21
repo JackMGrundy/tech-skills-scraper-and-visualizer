@@ -2,10 +2,10 @@ const express = require("express");
 const asyncMiddleware = require("../middleware/async");
 const router = express.Router();
 
+
 router.get("/", async (req, res, next) => {
   console.log("Get it");
-
-  res.status(200).send("ayo");
+  res.status(200).send("ayo is this live");
 
   //   Account for 200 and 400 ranges
 });
