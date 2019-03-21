@@ -104,10 +104,12 @@ frontend/build
 # misc
 frontend/.DS_Store
 frontend/.env
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
+frontend/.env
+frontend/.env.development
+frontend/.env.test
+frontend/.env.production
+frontend/package-lock.json
+frontend/run.txt
 
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
