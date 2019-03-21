@@ -91,32 +91,34 @@ backend/.dynamodb/
 
 ########### Frontend ################
 # dependencies
-frontend/react-app/node_modules
-frontend/react-app/.pnp
-frontend/react-app/.pnp.js
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
 
 # testing
-frontend/react-app/coverage
+frontend/coverage
 
 # production
-frontend/react-app/build
+frontend/build
 
 # misc
-frontend/react-app/.DS_Store
-frontend/react-app/.env.local
-frontend/react-app/.env.development.local
-frontend/react-app/.env.test.local
-frontend/react-app/.env.production.local
+frontend/.DS_Store
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-frontend/react-app/npm-debug.log*
-frontend/react-app/yarn-debug.log*
-frontend/react-app/yarn-error.log*
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
 
+########### Scraper ################
+scraper/__pycache__
+scraper2/__pycache__
 
 
 ############# Misc. ###############
 design/
-backend.code-workspace
-frontend.code-workspace
-scraper.code-workspace
+workspaces/
