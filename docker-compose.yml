@@ -31,6 +31,7 @@ services:
     volumes: 
       - ./scraper2:/scraper2
   
+      
   # Original
   # worker:
   #   build: ./scraper

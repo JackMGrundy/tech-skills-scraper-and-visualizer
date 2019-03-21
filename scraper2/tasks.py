@@ -15,7 +15,6 @@ import pprint
 client = MongoClient("mongodb://mongo:27017/testDB")
 db=client.testDB
 
-
 logger = get_task_logger(__name__)
 
 @app.task(bind=True, name="tasks")

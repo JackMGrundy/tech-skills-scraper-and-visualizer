@@ -18,6 +18,7 @@ db=client.testDB
 
 logger = get_task_logger(__name__)
 
+
 @app.task(bind=True, name="tasks")
 def testTask(self, a):
     print("ay")
