@@ -6,7 +6,7 @@ amqp==2.4.2
 # billiard==3.5.0.5
 # bottle-websocket==0.2.9
 # bottle==0.12.16
-# bs4==0.0.1
+bs4==0.0.1
 celery==4.2.1
 # certifi==2018.11.29
 # chardet==3.0.4

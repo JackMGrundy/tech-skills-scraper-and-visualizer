@@ -1,50 +1,9 @@
 version: '3'
 
 services:
-  worker:
-    build: ./scraper
-    # image: &img worker
-    image: worker
-    command: [/bin/sh , ./starter-script.sh]
-    # command: [celery, -A, tasks, worker, --pool=gevent, --concurrency=20, --loglevel=INFO]
-    # command: [celery, -A, tasks, worker, --loglevel=INFO]
-    # environment: &env
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-    depends_on:
-      - rabbitmq
-    restart: 'no'
-    volumes: 
-      - ./scraper:/scraper
 
-  worker2:
-    build: ./scraper2
-    image: worker2
-    command: [/bin/sh , ./starter-script.sh]
-    # command: [celery, -A, tasks, worker, --pool=gevent, --concurrency=20, --loglevel=INFO]
-    # command: [celery, -A, tasks, worker, --loglevel=INFO]
-    environment: 
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-    depends_on:
-      - rabbitmq
-    restart: 'no'
-    volumes: 
-      - ./scraper2:/scraper2
-  
-      
-  # Original
-  # worker:
-  #   build: ./scraper
-  #   image: &img worker
-  #   command: [celery, -A, tasks, worker, --pool=gevent, --concurrency=20, --loglevel=INFO]
-  #   # command: [celery, -A, tasks, worker, --loglevel=INFO]
-  #   environment: &env
-  #     - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-  #   depends_on:
-  #     - rabbitmq
-  #   restart: 'no'
-  #   volumes: 
-  #     - ./scraper:/scraper
+  rabbitmq:
+    image: rabbitmq:3.7.4
 
   mongo:
     image: mongo
@@ -52,7 +11,6 @@ services:
     - "27017:27017"
     volumes:
     - data-volume:/data/db2
-
 
   backend:
     build: 
@@ -68,28 +26,12 @@ services:
       - ./backend:/app
     environment:
       - MESSAGE_QUEUE=amqp://rabbitmq
+      - DATABASE_NAME=indeed
     links:
       - rabbitmq
     depends_on:
     - mongo
     - rabbitmq
-
-
-# Original
-  # backend:
-  #   build: ./backend
-  #   expose:
-  #     - "8080"
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./backend:/app
-  #   command: [ "nodemon", "app.js" ]
-  #   depends_on:
-  #   - mongo
-
-
-
 
   frontend:
     build: ./frontend
@@ -109,8 +51,45 @@ services:
     - backend
     - mongo
 
-  rabbitmq:
-    image: rabbitmq:3.7.4
+  worker:
+    build: ./scraper
+    image: worker
+    command: [/bin/sh , ./starter-script.sh]
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - DATABASE_NAME=indeed
+    expose:
+      - "9051"
+    ports:
+      - '9051:9051' 
+    links:
+      - backend
+    depends_on:
+      - rabbitmq
+      - backend
+    restart: 'no'
+    volumes: 
+      - ./scraper:/scraper
+
+  # worker2:
+  #   build: ./scraper2
+  #   image: worker2
+  #   command: [/bin/sh , ./starter-script.sh]
+  #   environment: 
+  #     - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+  #     - DATABASE_NAME=indeed
+  #   expose:
+  #     - "9050"
+  #   ports:
+  #     - '9050:9050' 
+  #   links:
+  #     - backend
+  #   depends_on:
+  #     - rabbitmq
+  #     - backend
+  #   restart: 'no'
+  #   volumes: 
+  #     - ./scraper2:/scraper2
 
 volumes:
   data-volume:

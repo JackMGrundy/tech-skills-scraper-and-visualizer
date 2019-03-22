@@ -1,4 +1,4 @@
 {
     "name": "Scraper Service Backend - Development",
-    "whitelist": "http://localhost:3000"
+    "whitelist": ["http://localhost:3000", "http://localhost:9051"]
 }

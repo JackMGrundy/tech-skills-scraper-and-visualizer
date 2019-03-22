@@ -1,3 +1,7 @@
 {
-    "scraperServerAPIEndpoint": "http://localhost:8080/"
+  "scraperServerAPIEndpoint": "http://localhost:8080/api/scraper",
+  "toastSettings": {
+    "autoClose": 500,
+    "pauseOnFocusLoss": false
+  }
 }

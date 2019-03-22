@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import urllib2
+import urllib3
 import re
 import requests
 import random
@@ -8,21 +8,26 @@ import json
 import os
 import sys
 import argparse
-import logging
-from helpers import *
+# import logging
+
+
+from indeedScraping.util.userAgents import userAgents
+from indeedScraping.util.helpers import uniqueItems, extractHTML, jsonSave, formatDateForMongo, replaceDict, match_class, sleepTimes
+
+
 from datetime import datetime, timedelta
 
-logging.basicConfig(
-	filename="scrape.log",
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S')
+# logging.basicConfig(
+# 	filename="scrape.log",
+#     format='%(asctime)s %(levelname)-8s %(message)s',
+#     level=logging.DEBUG,
+#     datefmt='%Y-%m-%d %H:%M:%S')
 
 # "3b753015197fb278"
 
-def extractJobHTML(jobKey, userAgent=None, writeLocation=None, prettify=True):
+def extractJobHTML(jobKey, tor=False, port=9050, userAgent=None, writeLocation=None, prettify=True):
 	"""
-	Wrapper around extractHTML to extract html for a job specified by the jobkye variable
+	Wrapper around extractHTML to extract html for a job specified by the jobkey variable
 
 	Args:
 		jobKey: hashed id of job on indeed.com
@@ -37,8 +42,8 @@ def extractJobHTML(jobKey, userAgent=None, writeLocation=None, prettify=True):
 	# Add search term
 	url = urlStub + str(jobKey)
 
-	html = extractHTML(url=url, userAgent=userAgent, writeLocation=writeLocation, prettify=prettify)
-	logging.info("Extracted html for job: " + str(jobKey) + " from: " + str(url))
+	html = extractHTML(url=url, tor=tor, port=port, userAgent=userAgent, writeLocation=writeLocation, prettify=prettify)
+	# logging.info("Extracted html for job: " + str(jobKey) + " from: " + str(url))
 	return html
 
 
@@ -100,7 +105,7 @@ def getTags(soup, tags, replaceDict):
 
 	matchedTags = []
 	# Iterate through tags
-	for tag, values in tags.iteritems():
+	for tag, values in tags.items():
 		# Iterate through each tag's values
 		for value in values:
 			if value in description:
@@ -134,7 +139,7 @@ def getPostDate(soup, replaceDict):
 	# These pages are surprisingly sparse on dates
 	dateRegex = re.compile("([0-9]+)(?:\+)* (days|hours|day|hour) ago ")
 	matches = dateRegex.findall(footerArea)
-	logging.info("Found match dates of: " + str(matches))
+	# logging.info("Found match dates of: " + str(matches))
 
 	if not matches:
 		return None
@@ -173,8 +178,8 @@ def getLocation(soup, replaceDict):
 
 	locationRegex = re.compile("- ([a-z\s,]+) (al|ak|az|ar|ca|co|ct|de|dc|fl|ga|hi|id|il|in|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy) ")
 	matches = locationRegex.findall(titleArea)
-	logging.info("Extracted title area: " + str(titleArea))
-	logging.info("Extracted location: " + str(matches))
+	# logging.info("Extracted title area: " + str(titleArea))
+	# logging.info("Extracted location: " + str(matches))
 
 	if matches:
 		match = matches[0]
@@ -186,19 +191,21 @@ def getLocation(soup, replaceDict):
 
 
 
-def extractJobInfo(jobkey, replaceDict):
+def extractJobInfo(jobkey, replaceDict, technologies, tor=False, port=9050):
 	""" 
 
 	Args:
 		jobkey: an indeed.com id for a job posting
 		replaceDict: a dictionary of chars to replace
+		technologies: a dictionary where keys indicate a technology and values are a list of terms
+						that indicate the technology is contained in the job post
 
 	Returns: 
 		A dictionary indicating where the job is, what data science tech they want, what degree they want, when it was posted
 
 	"""
 	info = {}
-	soup = extractJobHTML(jobKey=jobkey, prettify=False)
+	soup = extractJobHTML(jobKey=jobkey, tor=tor, port=port, prettify=False)
 	info["posted"] = formatDateForMongo(getPostDate(soup, replaceDict=replaceDict))
 	
 	loc = getLocation(soup, replaceDict=replaceDict)
@@ -207,13 +214,14 @@ def extractJobInfo(jobkey, replaceDict):
 		info["state"] = loc[1]
 	else:
 		info["city"] = None
+	# info["technologies"] = getTags(soup=soup, tags=technologies, replaceDict=replaceDict)
 	info["technologies"] = getTags(soup=soup, tags=technologies, replaceDict=replaceDict)
-	info["degrees"] = getTags(soup=soup, tags=degrees, replaceDict=replaceDict)
+	# info["degrees"] = getTags(soup=soup, tags=degrees, replaceDict=replaceDict)
 	info["jobkey"] = jobkey
 	return info
 
 
-def batchExtractJobInfo(jobkeys, replaceDict):
+def batchExtractJobInfo(jobkeys, replaceDict, technologies, tor=False, port=9050):
 	""" 
 
 	Args:
@@ -226,11 +234,11 @@ def batchExtractJobInfo(jobkeys, replaceDict):
 	"""
 	info = []
 	for key in jobkeys:
-		nextJob = extractJobInfo(key, replaceDict)
+		nextJob = extractJobInfo(key, replaceDict, technologies, tor=tor, port=port)
 
 		# Job must have a post date, and location to be usable
 		if nextJob["posted"] and nextJob["city"]:
-			info.append(extractJobInfo(key, replaceDict))
+			info.append(nextJob)
 		time.sleep(random.choice(sleepTimes))
 
 	return info

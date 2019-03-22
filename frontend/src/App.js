@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Route, Link, Redirect, Switch } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
-import ScraperForm from "./components/scraperForm.jsx";
+import scraperPage from "./components/scraperPage.jsx";
 import NavBar from "./components/navBar.jsx";
 import Dashboard from "./components/dashboard.jsx";
 import { ToastContainer } from 'react-toastify';
@@ -17,7 +17,7 @@ class App extends Component {
         <main className="container">
           <Switch>
             <Route path="/dashboard" component={Dashboard} />
-            <Route path="/scraper" component={ScraperForm} />
+            <Route path="/scraper" component={scraperPage} />
             <Redirect from="/" exact to="/scraper" />
           </Switch>
         </main>

@@ -15,23 +15,23 @@ class ScraperForm extends Component {
     jobAliases: "",
     skills: {},
     aliases: {},
-    errors: {}
+    errors: {},
+    active: false
   };
 
-
-    // Validation
-  escFunction = (event) => {
-    if(event.keyCode === 27) {
+  // Validation
+  escFunction = event => {
+    if (event.keyCode === 27) {
       this.setState({ errors: {} });
     }
-  }
-  componentDidMount(){
+  };
+  componentDidMount() {
     document.addEventListener("keydown", this.escFunction, false);
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     document.removeEventListener("keydown", this.escFunction, false);
   }
-  
+
   schema = {
     // Job title cannot be blank
     jobTitle: Joi.string()
@@ -44,6 +44,7 @@ class ScraperForm extends Component {
     aliases: Joi.object()
       .pattern(/^/, Joi.any())
       .label("Aliases"),
+    active: Joi.bool(),
     errors: Joi.object()
   };
 
@@ -52,8 +53,11 @@ class ScraperForm extends Component {
       .required()
       .label("Job title"),
     jobAliases: Joi.any().label("Job aliases"),
-    skills: Joi.string().required().label("Skill"),
+    skills: Joi.string()
+      .required()
+      .label("Skill"),
     aliases: Joi.any(),
+    active: Joi.bool(),
     errors: Joi.object()
   };
 
@@ -69,7 +73,7 @@ class ScraperForm extends Component {
     const errors = {};
     for (let item of error.details) errors[item.path[0]] = item.message;
     if (errors.hasOwnProperty("skills")) {
-      errors["skills"] = "Skills cannot be blank"
+      errors["skills"] = "Skills cannot be blank";
     }
     return errors;
   };
@@ -81,56 +85,86 @@ class ScraperForm extends Component {
     return error ? error.details[0].message : null;
   };
 
+  preparePayload = () => {
+    let params = {};
+    params["jobTitle"] = this.state.jobTitle ? this.state.jobTitle : "";
+    params["jobAliases"] = this.state.jobAliases
+      ? this.state.jobAliases.split(",")
+      : "";
+    params["skills"] = [];
 
+    console.log("what givess");
+
+    Object.keys(this.state.skills).forEach(key => {
+      console.log(this.state.aliases[key]);
+
+      var temp = [this.state.skills[key]];
+      if (
+        this.state.aliases[key].length > 0 &&
+        this.state.aliases[key] !== ""
+      ) {
+        temp = temp.concat(this.state.aliases[key].split(","));
+      }
+      params["skills"].push(temp);
+    });
+    console.log(params["skills"]);
+    params["active"] = this.state.active;
+    return JSON.stringify(params);
+  };
 
   // Backend
   handleSubmit = async e => {
     console.log("handle post triggered");
     e.preventDefault();
 
+    // Validate
     const errors = this.validate();
     this.setState({ errors: errors || {} });
     if (errors) return;
 
-    // const originalJob = this.state.job;
+    // Prepare payload
+    let payload = this.preparePayload();
 
     try {
-      await http.get(
-        config.scraperServerAPIEndpoint,
-        this.state.jobTitle
-      ).then(function (response) {
-        // handle success
-        console.log(response);
-        toast.success(response.data);
-      });
-      
+      await http
+        .post(config.scraperServerAPIEndpoint, {
+          payload
+        })
+        .then(function(response) {
+          // handle success
+          console.log(response);
+          toast.success(response.data);
+        });
     } catch (ex) {
-      console.log(ex);
-      toast.error("conection error");
-      // this.setState({ job: originalJob });
+      let status = ex["response"]["status"];
+      if (status === 400) {
+        toast.error("Duplicate job submitted", config.toastSettings);
+      }
+      if (status === 200) {
+        toast.error("Connection error", config.toastSettings);
+      }
     }
   };
-
 
   // Functionality
   handleChange = (e, id = null) => {
     const { name, value } = e.currentTarget;
-    // console.log("value", value);
 
     const errors = { ...this.state.errors };
     const errorMessage = this.validateProperty(e.currentTarget);
     if (errorMessage) {
       errors[name] = errorMessage;
-      console.log("errorMessage", errorMessage, "e.currentTarget", e.currentTarget);
+      console.log(
+        "errorMessage",
+        errorMessage,
+        "e.currentTarget",
+        e.currentTarget
+      );
     } else delete errors[name];
 
-    // console.log("current ids ", this.state.aliases);
-    // console.log("Updating name ", name, " value ", value, " id ", id);
     if (id === null) {
-      // console.log("updating based on just name")
       this.setState({ [name]: value, errors: errors });
     } else {
-      // console.log("updating based on name and id");
       let temp = this.state[name];
       temp[id] = value;
       this.setState({ [name]: temp, errors: errors });
@@ -153,6 +187,13 @@ class ScraperForm extends Component {
     delete skills[id];
     delete aliases[id];
     this.setState({ skills: skills, aliases: aliases });
+  };
+
+  handleCheckChange = e => {
+    const newState = !this.state.active;
+    this.setState({
+      active: newState
+    });
   };
 
   render() {
@@ -181,6 +222,19 @@ class ScraperForm extends Component {
           id={null}
           helperFunctions={helperFunctions}
         />
+        <div className="form-check">
+          <input
+            className="form-check-input mt-4"
+            type="checkbox"
+            name="form-check-input"
+            id="inlineCheckbox1"
+            checked={this.state.active}
+            onChange={this.handleCheckChange}
+          />
+          <label className="form-check-label mt-3" htmlFor="exampleRadios1">
+            Set scraping status to active
+          </label>
+        </div>
 
         <div>
           <h3 className="mt-5">Skills</h3>
