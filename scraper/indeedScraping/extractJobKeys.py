@@ -12,7 +12,7 @@ import traceback
 
 from indeedScraping.util.userAgents import userAgents
 from indeedScraping.util.helpers import uniqueItems, extractHTML, jsonSave, formatDateForMongo, replaceDict, match_class, sleepTimes
-# from .. util.userAgents import *
+
 # import logging
 from datetime import datetime, timedelta
 

@@ -91,7 +91,7 @@ def getTags(soup, tags, replaceDict):
 	    tags: a dictionary where the key is a tag and each value is a list of words.
 
 	Returns:
-	    A list of tags for which there was a word in theirs value lists in the html
+	    A list of tags for which there was at least one word in their value lists that appeared in the html
 
 	"""
 	

@@ -45,7 +45,7 @@ def testTask(self, jobId):
 
     jobKeys = []
     for searchTerm in searchTerms:
-        jobKeys += batchExtractMatches(numPages=1, searchTerm=searchTerm, searchRegexEx="jobKeysWithInfo\[\'([A-Za-z0-9]+)\'\] \=", 
+        jobKeys += batchExtractMatches(numPages=1, searchTerm=searchTerm, searchRegexEx=os.environ['JOB_KEYS_REGEX'], 
                     tor=True, port=9051, matchSingleWriteLocation=None, userAgent=None, sleepTime=None, htmlWriteLocations=None, 
 					matchWriteLocations=None, pageIncrements=10)
     

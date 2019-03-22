@@ -15,8 +15,7 @@ from indeedScraping.util.userAgents import userAgents
 from datetime import datetime, timedelta
 
 def uniqueItems(lst):
-	temp = set(lst)
-	return(list(temp))
+	return(list(set(lst)))
 
 
 def enableTor(port):
@@ -43,7 +42,7 @@ def enableTor(port):
 	return session
 
 
-def extractHTML(url, userAgent, tor=False, port=9050, writeLocation=None, prettify=True):
+def extractHTML(url, userAgent=None, tor=False, port=9050, writeLocation=None, prettify=True):
 	"""
 
 	Args:
@@ -78,8 +77,12 @@ def extractHTML(url, userAgent, tor=False, port=9050, writeLocation=None, pretti
 	# Store if indicated
 	if writeLocation:
 		jsonSave(soup, writeLocation)
+	
+	session.close()
 
 	return soup
+
+
 
 def pretty(soup):
 	soup = soup.prettify()

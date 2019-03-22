@@ -58,6 +58,7 @@ services:
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - DATABASE_NAME=indeed
+      - JOB_KEYS_REGEX="jobKeysWithInfo\[\'([A-Za-z0-9]+)\'\] \="
     expose:
       - "9051"
     ports:
