@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import httpService from "../services/httpService.js";
 import authService from "../services/authService.js";
 import { retrieveScraperTasksAPIEndpoint } from "../config.json";
-import { slide as Menu } from "react-burger-menu";
+// import { slide as Menu } from "react-burger-menu";
 
 class ScraperTasksForm extends Component {
   state = {};
