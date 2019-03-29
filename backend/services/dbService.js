@@ -3,23 +3,39 @@ const winston = require("winston");
 const mongoose = require("mongoose");
 
 // Connect to DB
+console.log(
+  "Connecting to: ",
+  process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME
+);
+
 mongoose
-  .connect("mongodb://mongo:27017/" + process.env.DATABASE_NAME)
-  .then(() => console.log("Connected to Mongo. Database: ", process.env.DATABASE_NAME))
+  .connect(process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME)
+  .then(() =>
+    console.log("Connected to Mongo. Database: ", process.env.DATABASE_NAME)
+  )
   .catch(err => console.log("Failed to connect to Mongo: ", err));
 
-const jobSchema = new mongoose.Schema({
-  active: Boolean,
-  jobTitle: String,
-  jobAliases: Array,
-  skills: Object
-});
+const scraperTaskSchema = new mongoose.Schema(
+  {
+    active: Boolean,
+    taskName: String,
+    jobTitle: String,
+    jobAliases: Array,
+    skills: Object,
+    username: String
+  },
+  { versionKey: false }
+);
 
-const Job = mongoose.model("Job", jobSchema);
+const ScraperTask = mongoose.model(
+  "scraper_task",
+  scraperTaskSchema,
+  "scraper_task"
+);
 
-createJobDoc = async params => {
+createScraperTask = async params => {
   try {
-    const entry = new Job(params);
+    const entry = new ScraperTask(params);
     const result = await entry.save();
     return result;
   } catch (e) {
@@ -27,18 +43,60 @@ createJobDoc = async params => {
   }
 };
 
-
-searchJobDoc = async params => { 
-  Object.keys(params).forEach( (key) => {
-    if ( params[key].length === 0 ) {
+searchScraperTask = async params => {
+  Object.keys(params).forEach(key => {
+    if (params[key].length === 0) {
       delete params[key];
     }
   });
-  console.log("updated params: ", params);
-  const jobs = Job
-    .find(params)
-  return jobs;
+  const scraperTask = ScraperTask.find(params);
+  return scraperTask;
 };
 
-module.exports.createJobDoc = createJobDoc;
-module.exports.searchJobDoc = searchJobDoc;
+const userSchema = new mongoose.Schema(
+  {
+    username: String,
+    password: String
+  },
+  { versionKey: false }
+);
+
+const User = mongoose.model("user", userSchema, "user");
+
+searchUsername = async username => {
+  const data = { username: username };
+  const res = User.find(data);
+  return res;
+};
+
+createUser = async (username, password) => {
+  try {
+    const entry = new User({ username: username, password: password });
+    const result = await entry.save();
+    return result;
+  } catch (e) {
+    return e;
+  }
+};
+
+getUserId = async (username) => {
+  const data = { username: username };
+  const res = User.find(data);
+  // console.log("res: ", res);
+  return res
+}
+
+validateUsernamePassword = async(username, password) => {
+  const data = { username: username, password: password}
+  const res = User.find(data);
+  // Res will be nonempty if match found
+  return res;
+}
+
+
+module.exports.createScraperTask = createScraperTask;
+module.exports.searchScraperTask = searchScraperTask;
+module.exports.searchUsername = searchUsername;
+module.exports.createUser = createUser;
+module.exports.validateUsernamePassword = validateUsernamePassword;
+module.exports.getUserId = getUserId;

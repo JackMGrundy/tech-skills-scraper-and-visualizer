@@ -15,6 +15,7 @@
     "express": "^4.16.4",
     "express-async-errors": "^3.1.1",
     "joi": "^14.3.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.4.17",
     "nodemon": "^1.18.10",
     "winston": "^2.4.4"

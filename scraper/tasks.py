@@ -7,8 +7,12 @@ from worker import app
 
 import requests
 
-from pymongo import MongoClient
+# from pymongo import MongoClient
 from bson.objectid import ObjectId
+from mongoengine import *
+from models.scraperTask import ScraperTask
+from models.jobPost import JobPost, createJobPost
+import datetime
 
 from indeedScraping.util.userAgents import userAgents
 from indeedScraping.util.helpers import uniqueItems, extractHTML, jsonSave, formatDateForMongo, replaceDict, match_class, sleepTimes
@@ -16,96 +20,51 @@ from indeedScraping.util.helpers import uniqueItems, extractHTML, jsonSave, form
 from indeedScraping.extractJobInfo import batchExtractJobInfo
 from indeedScraping.extractJobKeys import batchExtractMatches
 
-
-# connect to MongoDB, change the << MONGODB URL >> to reflect your own connection string
-client = MongoClient("mongodb://mongo:27017/" + os.environ["DATABASE_NAME"])
-db=client[ os.environ["DATABASE_NAME"] ]
-
-
-logger = get_task_logger(__name__)
-
+import sys
 
 @app.task(bind=True, name="scrape")
 def testTask(self, jobId):
     print("Starting job: ", jobId)
-    # db.jobs.insert_one( {"a": "this is a test"})
-    # print("jobId: ", jobId)
-    print("Retrieving info from mongo")
-    jobDetails = db.jobs.find_one({'_id': ObjectId(jobId)})
-    print("Job details: ", jobDetails)
-    jobTitle, jobAliases, skills, active = jobDetails['jobTitle'], jobDetails['jobAliases'], jobDetails['skills'], jobDetails['active']
-    print("Retrieved", jobTitle, jobAliases, skills, active)
 
+    scraperTaskDetails = ScraperTask.objects(pk=ObjectId(jobId))[0]
+    jobTitle, jobAliases, skills = scraperTaskDetails.jobTitle, scraperTaskDetails.jobAliases, scraperTaskDetails.skills
+    active, username, taskName = scraperTaskDetails.active, scraperTaskDetails.username, scraperTaskDetails.taskName
+    print("Retrieved", jobTitle, jobAliases, skills, active, username, taskName)
 
     # Extract jobKeys
     print("extracting info")
 
     # Format variables for scraping
     searchTerms = [jobTitle] + [ x for x in jobAliases if x != '']
+    print("searchTerms: ", searchTerms)
+
+    print("REGEX VAR: ", os.environ["JOB_KEYS_REGEX"])
+    os.environ["JOB_KEYS_REGEX"] = "jobKeysWithInfo\[\'([A-Za-z0-9]+)\'\] \="
 
     jobKeys = []
-    for searchTerm in searchTerms:
-        jobKeys += batchExtractMatches(numPages=1, searchTerm=searchTerm, searchRegexEx=os.environ['JOB_KEYS_REGEX'], 
-                    tor=True, port=9051, matchSingleWriteLocation=None, userAgent=None, sleepTime=None, htmlWriteLocations=None, 
-					matchWriteLocations=None, pageIncrements=10)
-    
-    print(jobKeys)
-    technologies = { x[0]:x[1:] for x in skills }
-    print(technologies)
-    jobs = batchExtractJobInfo(jobkeys=jobKeys[:2], replaceDict=replaceDict, technologies=technologies, tor=True, port=9051)
-    print(jobs)
-    
+    if os.environ['SCRAPING_ON']=='True':
+        for searchTerm in searchTerms:
+            print("WORKING ON SEARCH TERM: ", searchTerm)
+            jobKeys += batchExtractMatches(numPages=5, searchTerm=searchTerm, searchRegexEx=os.environ['JOB_KEYS_REGEX'], 
+                            tor=False, port=9051, matchSingleWriteLocation=None, userAgent=None, sleepTime=None, htmlWriteLocations=None, 
+                            matchWriteLocations=None, pageIncrements=10)
+            print("JOB KEYS ARE NOW: ", jobKeys)
 
-    
+        technologies = { x[0]:x for x in skills }
+        print("technologies: ", technologies)
+        jobs = batchExtractJobInfo(jobkeys=jobKeys, replaceDict=replaceDict, technologies=technologies, tor=False, port=9051)
+        print("First job extracted: ", jobs[0])
+        
+        # Insert to DB
+        for job in jobs:
+            nextJob = createJobPost(scraperTaskId=jobId, posted=job['posted'], city=job['city'], 
+                                    state=job['state'], technologies=job['technologies'], jobkey=job['jobkey'], 
+                                    taskName=taskName, username=username)
+            nextJob.save()
+    else:
+        print("SCRAPING SWITCHED OFF")
 
-
-    # print("completing task with jobId: ", jobId)
-
-
-    # session = requests.session()
-    # session.proxies = {}
-
-    # r = session.get('http://httpbin.org/ip')
-    # print(r.text)
-
-    # Connect to node backend...
-    # r = session.get("http://backend:8080/pyTest")
-    # print(r.text)
-
-    # Socks protocol / connect to tor agent
-    # session.proxies['http'] = 'socks5h://localhost:9051'
-    # session.proxies['https'] = 'socks5h://localhost:9051'
-
-    # Headers
-    # headers = {}
-    # headers['User-agent'] = "HotJava/1.1.2 FCS"
-
-
-    # r = session.get('http://httpbin.org/ip')
-    # print(r.text)
-
-
-
-
-
-    # session = requests.session()
-    # r=session.get('https://www.nytimes.com/')
-    # print(r.headers)
-    #Step 2: Create sample data
-    # names = ['Kitchen','Animal','State', 'Tastey', 'Big','City','Fish', 'Pizza','Goat', 'Salty','Sandwich','Lazy', 'Fun']
-    # company_type = ['LLC','Inc','Company','Corporation']
-    # company_cuisine = ['Pizza', 'Bar Food', 'Fast Food', 'Italian', 'Mexican', 'American', 'Sushi Bar', 'Vegetarian']
-    # for x in range(1, 10):
-    #     business = {
-    #         'name' : names[randint(0, (len(names)-1))] + ' ' + names[randint(0, (len(names)-1))]  + ' ' + company_type[randint(0, (len(company_type)-1))],
-    #         'rating' : randint(1, 5),
-    #         'cuisine' : company_cuisine[randint(0, (len(company_cuisine)-1))] 
-    #     }
-    #     #Step 3: Insert business object directly into MongoDB via isnert_one
-    #     result=db.reviews.insert_one(business)
-    #     #Step 4: Print to the console the ObjectID of the new document
-    #     print('Created {0} of 500 as {1}'.format(x,result.inserted_id))
-
-    #     print("AYYYYYYYYYYYYYOOOOOOOOOOOOOOO\n\n\n\n\n\n")
-    #     fivestarcount = db.reviews.find_one()
-    #     pprint.pprint(fivestarcount)
+    # Notify backend
+    completedEndPoint = "http://backend:8080/api/scraper/jobCompleted"
+    requests.post(completedEndPoint, json={"jobId": jobId, "status": "completed"})
+# EOF

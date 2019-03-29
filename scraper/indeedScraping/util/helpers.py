@@ -58,6 +58,8 @@ def extractHTML(url, userAgent=None, tor=False, port=9050, writeLocation=None, p
 		session = enableTor(port)
 	else:
 		session = requests.session()
+		r = session.get('http://httpbin.org/ip')
+		# print( "NOT using Tor. Sending requests from port: {} and ip: {}".format(port, r.text) )
 
 	# Request
 	if not userAgent:
@@ -69,7 +71,9 @@ def extractHTML(url, userAgent=None, tor=False, port=9050, writeLocation=None, p
 	headers = { "User-Agent":  ua}
 
 	r = session.get(url, headers=headers)
+	# print("\n\n\n\n\n", "FIRST PART OF RESPONSE: ", r.text[0:500], "\n\n\n\n\n\n")
 	soup = BeautifulSoup(r.text, 'html.parser')
+	
 
 	if prettify:
 		soup = pretty(soup)
@@ -173,5 +177,6 @@ def formatDateForMongo(date):
 
 
 
-sleepTimes = [1, .75, 1.25, .8, 1.2]
+# sleepTimes = [.25, .5, .75]
+sleepTimes = [0]
 # EOF

@@ -3,7 +3,7 @@ import React, { Component } from "react";
 class Dashboard extends Component {
   state = {};
   render() {
-    return <h1>Ayo</h1>;
+    return <h1>Results</h1>;
   }
 }
 

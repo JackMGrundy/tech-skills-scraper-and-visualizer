@@ -9,8 +9,8 @@ services:
     image: mongo
     ports:
     - "27017:27017"
-    volumes:
-    - data-volume:/data/db2
+    # volumes:
+    # - data-volume:/data/db2
 
   backend:
     build: 
@@ -27,11 +27,19 @@ services:
     environment:
       - MESSAGE_QUEUE=amqp://rabbitmq
       - DATABASE_NAME=indeed
+      - DB_CONNECTION_STRING=mongodb://mongo:27017/
     links:
       - rabbitmq
     depends_on:
     - mongo
     - rabbitmq
+    # logging:
+      # driver: syslog
+      # options:
+        # tag: docker/website
+        # syslog-address: "udp://localhost:514"
+        # "syslog-address": "udp://1.2.3.4:1111"
+        # syslog-format: "rfc3164"
 
   frontend:
     build: ./frontend
@@ -51,6 +59,7 @@ services:
     - backend
     - mongo
 
+
   worker:
     build: ./scraper
     image: worker
@@ -59,6 +68,9 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - DATABASE_NAME=indeed
       - JOB_KEYS_REGEX="jobKeysWithInfo\[\'([A-Za-z0-9]+)\'\] \="
+      - DB_PORT=27017
+      - TOR_PORT=9051
+      - SCRAPING_ON=False
     expose:
       - "9051"
     ports:
@@ -91,6 +103,7 @@ services:
   #   restart: 'no'
   #   volumes: 
   #     - ./scraper2:/scraper2
+
 
 volumes:
   data-volume:

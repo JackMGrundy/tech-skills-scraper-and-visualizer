@@ -1,103 +1,69 @@
 import React, { Component } from "react";
-import http from "../services/httpService";
 import config from "../config.json";
 import { toast } from "react-toastify";
 import SkillsGrid from "./skillsGrid";
 import InputList from "./inputList.jsx";
 import Input from "./input.jsx";
-// import Sidebar from "./sidebar.jsx";
+import httpService from "../services/httpService";
+import authService from "../services/authService";
+import validateService from "../services/validateService";
+// import keyService from "../services/keyService";
 const shortid = require("shortid");
 const Joi = require("joi");
 
 class ScraperForm extends Component {
   state = {
+    taskName: "",
     jobTitle: "",
     jobAliases: "",
     skills: {},
     aliases: {},
     errors: {},
-    active: false
+    active: true
   };
-
-  // Validation
-  escFunction = event => {
-    if (event.keyCode === 27) {
-      this.setState({ errors: {} });
-    }
-  };
-  componentDidMount() {
-    document.addEventListener("keydown", this.escFunction, false);
-  }
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.escFunction, false);
-  }
 
   schema = {
-    // Job title cannot be blank
+    taskName: Joi.string()
+      .required()
+      .label("Task title"),
     jobTitle: Joi.string()
       .required()
       .label("Job title"),
     jobAliases: Joi.any().label("Job aliases"),
-    skills: Joi.object()
-      .pattern(/^/, Joi.string())
-      .label("Skills"),
-    aliases: Joi.object()
-      .pattern(/^/, Joi.any())
-      .label("Aliases"),
+    skills: Joi.any().label("Skills"),
+    aliases: Joi.object().label("Aliases"),
     active: Joi.bool(),
     errors: Joi.object()
   };
 
-  fieldSchema = {
-    jobTitle: Joi.string()
-      .required()
-      .label("Job title"),
-    jobAliases: Joi.any().label("Job aliases"),
-    skills: Joi.string()
-      .required()
-      .label("Skill"),
-    aliases: Joi.any(),
-    active: Joi.bool(),
-    errors: Joi.object()
-  };
+  componentDidMount() {
+    // Clear errors on escape key
+    document.addEventListener("keydown", this.clearErrorsOnEscape, false);
+  }
 
-  validate = () => {
-    console.log("validating");
-    const options = { abortEarly: false };
-    const { error } = Joi.validate(this.state, this.schema, options);
-    // console.log(error.details);
-    // return(error);
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.clearErrorsOnEscape, false);
+  }
 
-    // const { error } = Joi.validate( {jobTitle: this.state.jobTitle}, this.schema, options);
-    if (!error) return null;
-    const errors = {};
-    for (let item of error.details) errors[item.path[0]] = item.message;
-    if (errors.hasOwnProperty("skills")) {
-      errors["skills"] = "Skills cannot be blank";
+  clearErrorsOnEscape = (event) => {
+    const state = this.state;
+    if (event.keyCode === 27) {
+      state["errors"] = {};
     }
-    return errors;
+    this.setState(state)
   };
 
-  validateProperty = ({ name, value }) => {
-    const obj = { [name]: value };
-    const schema = { [name]: this.fieldSchema[name] };
-    const { error } = Joi.validate(obj, schema);
-    return error ? error.details[0].message : null;
-  };
-
+  // Format state into payload for backend
   preparePayload = () => {
     let params = {};
     params["jobTitle"] = this.state.jobTitle ? this.state.jobTitle : "";
+    params["taskName"] = this.state.taskName ? this.state.taskName : "";
     params["jobAliases"] = this.state.jobAliases
       ? this.state.jobAliases.split(",")
       : "";
     params["skills"] = [];
 
-    console.log("what givess");
-
     Object.keys(this.state.skills).forEach(key => {
-      console.log(this.state.aliases[key]);
-
       var temp = [this.state.skills[key]];
       if (
         this.state.aliases[key].length > 0 &&
@@ -107,38 +73,42 @@ class ScraperForm extends Component {
       }
       params["skills"].push(temp);
     });
-    console.log(params["skills"]);
+
+    // By default, scraper will start collecting data for this task
     params["active"] = this.state.active;
+
+    // Set the username
+    params["username"] = authService.getUsername();
+
     return JSON.stringify(params);
   };
 
-  // Backend
+  // Submit new scraper task to backend
   handleSubmit = async e => {
-    console.log("handle post triggered");
     e.preventDefault();
 
     // Validate
-    const errors = this.validate();
+    const errors = validateService.validateState(this.state, this.schema);
     this.setState({ errors: errors || {} });
     if (errors) return;
 
     // Prepare payload
     let payload = this.preparePayload();
 
+    // Attempt to submit new scraper task
     try {
-      await http
+      await httpService
         .post(config.scraperServerAPIEndpoint, {
           payload
         })
         .then(function(response) {
           // handle success
-          console.log(response);
-          toast.success(response.data);
+          toast.success(response.data, config.toastSettings);
         });
     } catch (ex) {
-      let status = ex["response"]["status"];
-      if (status === 400) {
-        toast.error("Duplicate job submitted", config.toastSettings);
+      let status = ex.response.status;
+      if (status >= 400 && status < 500) {
+        toast.error(ex.response.data, config.toastSettings);
       }
       if (status === 200) {
         toast.error("Connection error", config.toastSettings);
@@ -150,21 +120,24 @@ class ScraperForm extends Component {
   handleChange = (e, id = null) => {
     const { name, value } = e.currentTarget;
 
+    // Validate
     const errors = { ...this.state.errors };
-    const errorMessage = this.validateProperty(e.currentTarget);
+    const fieldSchema = { [name]: this.schema[name] };
+    const errorMessage = validateService.validateProperty(
+      name,
+      value,
+      fieldSchema
+    );
     if (errorMessage) {
       errors[name] = errorMessage;
-      console.log(
-        "errorMessage",
-        errorMessage,
-        "e.currentTarget",
-        e.currentTarget
-      );
     } else delete errors[name];
 
+    // Changing a piece of state that is a string or a number
     if (id === null) {
       this.setState({ [name]: value, errors: errors });
-    } else {
+    }
+    // Changing a piece of state that is an element in an array
+    else {
       let temp = this.state[name];
       temp[id] = value;
       this.setState({ [name]: temp, errors: errors });
@@ -181,7 +154,6 @@ class ScraperForm extends Component {
   };
 
   handleDeleteSkill = id => {
-    console.log("deleting id ", id);
     let skills = { ...this.state.skills };
     let aliases = { ...this.state.aliases };
     delete skills[id];
@@ -189,7 +161,7 @@ class ScraperForm extends Component {
     this.setState({ skills: skills, aliases: aliases });
   };
 
-  handleCheckChange = e => {
+  handleCheckChange = () => {
     const newState = !this.state.active;
     this.setState({
       active: newState
@@ -197,7 +169,14 @@ class ScraperForm extends Component {
   };
 
   render() {
-    const { errors, jobTitle, jobAliases, skills, aliases } = this.state;
+    const {
+      errors,
+      taskName,
+      jobTitle,
+      jobAliases,
+      skills,
+      aliases
+    } = this.state;
     const helperFunctions = {
       handleChange: this.handleChange,
       handleDeleteComponent: this.handleDeleteSkill
@@ -205,8 +184,16 @@ class ScraperForm extends Component {
 
     return (
       <div>
-        {/* <Sidebar></Sidebar> */}
-        <h3 className="mt-5">Job title</h3>
+        <h3 className="mt-5">Create new task</h3>
+        <Input
+          label="Task title"
+          name="taskName"
+          value={taskName}
+          onChange={e => this.handleChange(e)}
+          margin=""
+          size={"form-control-lg"}
+          error={errors.taskName}
+        />
         <Input
           label="Job title"
           name="jobTitle"
@@ -238,6 +225,12 @@ class ScraperForm extends Component {
 
         <div>
           <h3 className="mt-5">Skills</h3>
+          <button
+            onClick={this.handleCreateSkill}
+            className="btn-lg btn-success mt-1"
+          >
+            Add skill
+          </button>{" "}
           <SkillsGrid
             skills={skills}
             aliases={aliases}
@@ -247,14 +240,8 @@ class ScraperForm extends Component {
             numCols={3}
             error={errors.skills}
           />
-          <button
-            onClick={this.handleCreateSkill}
-            className="btn-lg btn-success mt-5"
-          >
-            Add skill
-          </button>{" "}
         </div>
-        <button onClick={this.handleSubmit} className="btn-lg btn-primary mt-1">
+        <button onClick={this.handleSubmit} className="btn-lg btn-primary mt-5">
           Submit
         </button>
       </div>

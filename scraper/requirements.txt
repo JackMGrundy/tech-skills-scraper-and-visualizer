@@ -18,6 +18,7 @@ greenlet==0.4.13
 # idna==2.7
 # kombu==4.4.0
 # macholib==1.11
+mongoengine==0.17.0
 # more-itertools==6.0.0
 # numpy==1.15.4
 # pandas==0.23.4
@@ -27,7 +28,7 @@ greenlet==0.4.13
 # py==1.8.0
 # PyAMQP==0.0.7.1
 PyInstaller==3.3.1
-pymongo==3.7.2
+# pymongo==3.7.2
 PySocks==1.6.8
 # pytest==4.3.1
 # python-dateutil==2.7.5

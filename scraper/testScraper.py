@@ -120,6 +120,34 @@ class TestExtractJobInfo(unittest.TestCase):
         matchedTags = getTags(soup=soup, tags=testTags, replaceDict=replaceDict)
         self.assertIn("commonWords", matchedTags)
         self.assertIn("software", matchedTags)
+
+    def test_getTags(self):
+
+        # Directories
+        wd = os.path.dirname(os.path.realpath(__file__))
+        jobDescriptionsFolder = os.path.join(wd, 'testCases', 'jobDescriptions')
+    
+        # Basic technology matching test
+        arkansasSE = open( os.path.join(jobDescriptionsFolder, 'arkansas-se.htm') )
+        soup = bs4.BeautifulSoup( arkansasSE, "html.parser")
+        arkansasSE.close()
+
+        testTags = {"sql": ["SQL"], "java": ["java"], "machine learning": ["machine learning"], "python": ["python"]} 
+        matchedTags = getTags(soup=soup, tags=testTags, replaceDict=replaceDict)
+
+        self.assertEqual(['machine learning', 'sql', 'java', 'python'].sort(), matchedTags.sort())
+
+
+        # Matching javascript shouldn't also match java
+        javascriptNotJava = open( os.path.join(jobDescriptionsFolder, 'javascriptNotJava.htm') )
+        soup = bs4.BeautifulSoup( javascriptNotJava, "html.parser")
+        javascriptNotJava.close()        
+
+        testTags = {"javascript": ["javascript"], "ruby on rails": ["ruby on rails"]} 
+        matchedTags = getTags(soup=soup, tags=testTags, replaceDict=replaceDict)
+
+        self.assertEqual(['ruby on rails', 'javascript'].sort(), matchedTags.sort())
+
     
 
     def test_getPostDate(self):

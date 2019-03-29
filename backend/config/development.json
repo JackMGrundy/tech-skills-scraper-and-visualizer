@@ -1,4 +1,5 @@
 {
     "name": "Scraper Service Backend - Development",
-    "whitelist": ["http://localhost:3000", "http://localhost:9051"]
+    "jwtPrivateKey": "howDoYaDo", 
+    "whitelist": ["http://localhost:3000", "http://localhost:9051", "http://localhost:9050"]
 }

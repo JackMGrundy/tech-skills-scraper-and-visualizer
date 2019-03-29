@@ -1,9 +1,10 @@
 require("express-async-errors");
 const winston = require("winston");
 const config = require("config");
-const Joi = require("joi");
 const express = require("express");
 const scraperRoutes = require("./routes/scraper.js");
+const registerRoutes = require("./routes/register.js");
+const loginRoutes = require("./routes/login.js")
 const homeRoute = require("./routes/home.js");
 const whitelist = require("./middleware/whitelist.js");
 const error = require("./middleware/error.js");
@@ -23,6 +24,8 @@ app.use(whitelist)
 app.use(express.json());
 
 // Routes
+app.use("/api/register", registerRoutes);
+app.use("/api/login", loginRoutes);
 app.use("/api/scraper", scraperRoutes);
 app.use("/", homeRoute);
 app.use(error);

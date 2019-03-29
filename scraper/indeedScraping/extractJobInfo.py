@@ -94,12 +94,15 @@ def getTags(soup, tags, replaceDict):
 	    A list of tags for which there was at least one word in their value lists that appeared in the html
 
 	"""
+	# print("TAGS: ", tags )
+	# print("SOUP: ", soup.text[0:500] )
 	
 	# Convert html to list for easier search
 	# html = html.split(" ")
 	
 	# Limit search to description
 	description = str(soup.find_all(match_class(["jobsearch-JobComponent-description"])))
+	# print("\n\n\nFIRST PART OF DESCRIPTION: ", description[:500])
 	description = cleanHTML(description, lowercase=True, removeNonAscii=True, cutoffFooter=True, replaceDict=replaceDict)
 	# logging.info("Extracting tags from description:\n " + str(description))
 
@@ -108,7 +111,7 @@ def getTags(soup, tags, replaceDict):
 	for tag, values in tags.items():
 		# Iterate through each tag's values
 		for value in values:
-			if value in description:
+			if value.lower() in description:
 				matchedTags.append(tag)
 				continue
 	

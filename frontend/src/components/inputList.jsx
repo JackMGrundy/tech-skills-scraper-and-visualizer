@@ -15,10 +15,9 @@ class InputList extends Component {
   }
 
   handleClear = () => {
-    // const { name, id } = this.state;
     const { name, id, helperFunctions } = this.props;
-
-    let obj = { currentTarget: { name: name, value: "" } };
+    // Indicate the name of the field to change the value to change to
+    const obj = { currentTarget: { name: name, value: "" } };
     helperFunctions.handleChange(obj, id);
   };
 
@@ -57,7 +56,6 @@ class InputList extends Component {
   };
 
   render() {
-    // console.log(this);
     const { values, id, helperFunctions } = this.props;
     const { newValue } = this.state;
     return (
