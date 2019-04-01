@@ -43,6 +43,27 @@ createScraperTask = async params => {
   }
 };
 
+deleteScraperTask = async params => {
+  const res = ScraperTask.deleteOne(params, function(err) {
+    if (err) return err;
+  });
+  return res;
+};
+
+upsertScraperTask = async params => {
+  try {
+    // const entry = new ScraperTask(params);
+    const result = await ScraperTask.findOneAndUpdate(
+      { username: params.username, taskName: params.taskName },
+      params,
+      { upsert: true }
+    );
+    return result;
+  } catch (e) {
+    return e;
+  }
+};
+
 searchScraperTask = async params => {
   Object.keys(params).forEach(key => {
     if (params[key].length === 0) {
@@ -79,20 +100,19 @@ createUser = async (username, password) => {
   }
 };
 
-getUserId = async (username) => {
+getUserId = async username => {
   const data = { username: username };
   const res = User.find(data);
   // console.log("res: ", res);
-  return res
-}
+  return res;
+};
 
-validateUsernamePassword = async(username, password) => {
-  const data = { username: username, password: password}
+validateUsernamePassword = async (username, password) => {
+  const data = { username: username, password: password };
   const res = User.find(data);
   // Res will be nonempty if match found
   return res;
-}
-
+};
 
 module.exports.createScraperTask = createScraperTask;
 module.exports.searchScraperTask = searchScraperTask;
@@ -100,3 +120,5 @@ module.exports.searchUsername = searchUsername;
 module.exports.createUser = createUser;
 module.exports.validateUsernamePassword = validateUsernamePassword;
 module.exports.getUserId = getUserId;
+module.exports.upsertScraperTask = upsertScraperTask;
+module.exports.deleteScraperTask = deleteScraperTask;

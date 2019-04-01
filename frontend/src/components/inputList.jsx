@@ -131,17 +131,17 @@ class InputList extends Component {
         ) : (
           <button
             onClick={() => helperFunctions.handleDeleteComponent(id)}
-            className="btn btn-danger menu"
+            className="btn btn-danger menu ml-1"
           >
-            Delete
+            -
           </button>
         )}
         <button
           onClick={this.handleClear}
-          className="btn btn-warning"
+          className="btn btn-warning ml-1"
           type="button"
         >
-          Clear
+          Clear aliases
         </button>
       </div>
     );

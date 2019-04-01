@@ -11,16 +11,16 @@ router.post("/createTask", auth, async (req, res) => {
   let payload = JSON.parse(req.body.payload);
   console.log("Payload: ", payload);
 
-  // Check if job already exists in DB. A user cannot have multiple tasks with the same name
-  const params = { taskName: payload.taskName, username: payload.username }
-
-  const duplicate = await dbService.searchScraperTask(params);
-  if (duplicate.length > 0) {
-    res.status(400).send("Duplicate scraper task");
-  } else {
     // Add job to DB
     console.log("adding scraper task to db");
-    const { _id } = await dbService.createScraperTask(payload);
+    const r = await dbService.upsertScraperTask(payload);
+    
+    let _id;
+    if (r !== null) {
+       _id  = r._id;
+    } else {
+       _id  = dbService.searchScraperTask(payload)._id;
+    }
 
     // If active, add to queue
     if (payload.active) {
@@ -32,11 +32,12 @@ router.post("/createTask", auth, async (req, res) => {
     } else {
       res.status(200).send("Created scraper task");
     }
-  }
+  });
+  // }
 
   // User is requesting their tasks
   router.post("/retrieveTasks", auth, async (req, res) => {
-    console.log("Retrieving users tasks");
+    console.log("Retrieving user's tasks");
     let payload = JSON.parse(req.body.payload);
     console.log("Req: ", payload);
 
@@ -52,7 +53,23 @@ router.post("/createTask", auth, async (req, res) => {
     res.send(200);
   });
 
-  //   Account for 200 and 400 ranges
-});
+  // User is requesting to delete a task
+  router.delete("/deleteTask", (req, res) => {
+    console.log("Deleting user's task");
+
+    console.log("REQ: \n\n\n\n", Object.keys(req));
+    console.log("\n\n\n", req.body);
+    let payload = JSON.parse(req.body.payload);
+    console.log("Req: ", payload);
+    const task = dbService.searchScraperTask(payload);
+    if (!task) return res.status(404).send('The task was not found');
+
+    const r = dbService.deleteScraperTask(payload);
+    console.log("RRRR: ", r)
+
+    res.status(200).send("deleted");
+  });
+
+
 
 module.exports = router;

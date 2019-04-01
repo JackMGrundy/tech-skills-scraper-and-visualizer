@@ -1,5 +1,6 @@
 {
   "scraperServerAPIEndpoint": "http://localhost:8080/api/scraper/createTask",
+  "deleteScraperServerAPIEndpoint": "http://localhost:8080/api/scraper/deleteTask",
   "retrieveScraperTasksAPIEndpoint": "http://localhost:8080/api/scraper/retrieveTasks",
   "registerAPIEndpoint": "http://localhost:8080/api/register",
   "loginAPIEndpoint": "http://localhost:8080/api/login",

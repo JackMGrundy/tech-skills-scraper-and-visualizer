@@ -15,6 +15,10 @@ class RegistrationForm extends Form {
     this.onMount();
   }
 
+  componentWillUnmount(){
+    this.unMount();
+  }
+
   schema = {
     username: Joi.string()
       .required()

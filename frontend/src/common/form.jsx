@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Input from "../components/input.jsx";
 import validateService from "../services/validateService";
-// import keyService from "../services/keyService";
 
 class Form extends Component {
   state = { data: {}, errors: {} };
@@ -12,11 +11,12 @@ class Form extends Component {
     document.addEventListener("keydown", this.clearErrorsOnEscape, false);
   };
 
-  clearErrorsOnEscape = (event, state) => {
+  clearErrorsOnEscape = (event) => {
+    let errors = this.state.errors;
     if (event.keyCode === 27) {
-      state["errors"] = {};
+      errors = {};
     }
-    return state;
+    this.setState({errors});
   };
 
   unMount = () => {
