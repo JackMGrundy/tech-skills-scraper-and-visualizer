@@ -13,7 +13,6 @@ const Input = ({ error, name, label, size, margin, id, ...rest }) => {
         autoComplete="off"
         autoCorrect="off"
         spellCheck="false"
-        type="text"
         className={"form-control " + size + " " + margin}
       />
       {error && <div className="alert alert-danger">{error}</div>}

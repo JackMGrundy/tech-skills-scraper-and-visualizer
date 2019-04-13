@@ -31,18 +31,15 @@
   }
 }
 
+
 .aliases {
   width: 300px;
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* background: #ffffff; */
 }
-/* .menu-item {
-  cursor: pointer;
-  padding: 5px;
-  height: 28px;
-  border-bottom: 1px solid rgb(187, 187, 187);
+
+.btn-primary {
+  color: "black";
 }
-.menu-item:hover {
-  color: #2980b9;
-} */
+
+.btn-test {
+  color: "black";
+}

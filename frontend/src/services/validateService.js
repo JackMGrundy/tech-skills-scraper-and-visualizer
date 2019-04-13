@@ -2,7 +2,6 @@ const Joi = require("joi");
 
 let validateProperty = ( name, value, schema) => {
     const obj = { [name]: value };
-    console.log("SCHEMA IN SERVICE: ", schema);
     const { error } = Joi.validate(obj, schema);
     return error ? error.details[0].message : null;
   };

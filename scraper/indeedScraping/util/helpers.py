@@ -178,5 +178,5 @@ def formatDateForMongo(date):
 
 
 # sleepTimes = [.25, .5, .75]
-sleepTimes = [0]
+sleepTimes = [1]
 # EOF

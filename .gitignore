@@ -118,9 +118,9 @@ frontend/yarn-error.log*
 
 ########### Scraper ################
 scraper/__pycache__
-scraper2/__pycache__
 scraper/misc-celery-commands.txt
 
 ############# Misc. ###############
 design/
 workspaces/
+frontend-old/

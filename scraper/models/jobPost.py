@@ -14,9 +14,12 @@ class JobPost(Document):
     jobkey = StringField(required=True, max_length=200)
     taskName = StringField(required=True, max_length=200)
     username = StringField(required=True, max_length=200)
+    title = StringField(required=False, max_length=200)
+    company = StringField(required=False, max_length=200)
+    experience = StringField(required=False, max_length=200)
 
 
-def createJobPost(scraperTaskId, posted, city, state, technologies, jobkey, taskName, username):
+def createJobPost(scraperTaskId, posted, city, state, technologies, jobkey, taskName, username, title, company, experience):
     return (
         JobPost(
             scraperTaskId = scraperTaskId,
@@ -26,7 +29,10 @@ def createJobPost(scraperTaskId, posted, city, state, technologies, jobkey, task
             technologies = technologies,
             jobkey = jobkey,
             taskName = taskName,
-            username = username
+            username = username,
+            title = title,
+            company = company,
+            experience = experience
         )
     )
 # EOF

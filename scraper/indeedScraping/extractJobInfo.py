@@ -8,7 +8,6 @@ import json
 import os
 import sys
 import argparse
-# import logging
 
 
 from indeedScraping.util.userAgents import userAgents
@@ -62,7 +61,6 @@ def cleanHTML(html, lowercase=False, removeNonAscii=False, cutoffFooter=False, d
 			send to lowercase
 			remove non ascii
 	"""
-
 	if lowercase:
 		html = html.lower()
 
@@ -77,9 +75,8 @@ def cleanHTML(html, lowercase=False, removeNonAscii=False, cutoffFooter=False, d
 		html = html.split("html = html.split(" ")")
 		html = html[0]
 
-	if descriptionOnly:
-		"jobsearch-JobComponent-description"
-
+	# if descriptionOnly:
+		# "jobsearch-JobComponent-description"
 	return html
 
 
@@ -94,12 +91,6 @@ def getTags(soup, tags, replaceDict):
 	    A list of tags for which there was at least one word in their value lists that appeared in the html
 
 	"""
-	# print("TAGS: ", tags )
-	# print("SOUP: ", soup.text[0:500] )
-	
-	# Convert html to list for easier search
-	# html = html.split(" ")
-	
 	# Limit search to description
 	description = str(soup.find_all(match_class(["jobsearch-JobComponent-description"])))
 	# print("\n\n\nFIRST PART OF DESCRIPTION: ", description[:500])
@@ -111,9 +102,14 @@ def getTags(soup, tags, replaceDict):
 	for tag, values in tags.items():
 		# Iterate through each tag's values
 		for value in values:
-			if value.lower() in description:
-				matchedTags.append(tag)
-				continue
+			# Don't match "Java" in "Javascript"
+			validPrefixes = [".", " ", "/", "-", ":", ";", "(", ")", ",", "\"", "\'", "!"]
+			validSuffixes = [".", " ", "/", "-", ":", ";", "(", ")", ",", "\"", "\'", "!"]
+			valid = [ prefix + value.lower() + suffix for suffix in validSuffixes for prefix in validPrefixes]
+			for v in valid:
+				if v in description:
+					matchedTags.append(tag)
+					continue
 	
 	# Unique
 	matchedTags = list(set(matchedTags))
@@ -177,12 +173,9 @@ def getLocation(soup, replaceDict):
 	# Subet search to title area
 	titleArea = soup.find('title').string
 	titleArea = cleanHTML(titleArea, lowercase=True, removeNonAscii=True, cutoffFooter=True, replaceDict=replaceDict)
-	# logging.info("Scraping location from: \n" + str(titleArea))
 
 	locationRegex = re.compile("- ([a-z\s,]+) (al|ak|az|ar|ca|co|ct|de|dc|fl|ga|hi|id|il|in|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy) ")
 	matches = locationRegex.findall(titleArea)
-	# logging.info("Extracted title area: " + str(titleArea))
-	# logging.info("Extracted location: " + str(matches))
 
 	if matches:
 		match = matches[0]
@@ -191,6 +184,106 @@ def getLocation(soup, replaceDict):
 		return((city, state))
 	else: 
 		return None
+
+
+
+def getTitle(soup):
+	""" 
+
+	Args:
+		html: bs4 soup of an Indeed.com job post
+
+	Returns: 
+		The title of the job post
+
+	"""	
+	# Subet search to title area
+	titleArea = soup.find('title').string
+	titleArea = cleanHTML(titleArea, lowercase=True, removeNonAscii=True, cutoffFooter=True)
+	titleRegex = re.compile("(^.+?)-")
+	matches = titleRegex.findall(titleArea)
+
+	if matches:
+		match = matches[0]
+		return match
+	else: 
+		return ""
+
+
+
+def getCompany(soup):
+	""" 
+
+	Args:
+		html: bs4 soup of an Indeed.com job post
+
+	Returns: 
+		The name of the posting company
+
+	"""	
+	infoArea = soup.findAll("div", {"class": "icl-u-lg-mr--sm icl-u-xs-mr--xs"})
+	if infoArea: 
+		infoArea = str(infoArea[0])
+	else:
+		return ""
+	
+	infoArea = cleanHTML(infoArea, lowercase=True, removeNonAscii=True, cutoffFooter=True)
+	companyRegex = re.compile(">(.+)<")
+	matches = companyRegex.findall(infoArea)
+
+	if matches:
+		match = matches[0]
+		return match
+	else: 
+		return ""
+
+def getExperience(soup):
+	""" 
+
+	Args:
+		html: bs4 soup of an Indeed.com job post
+
+	Returns: 
+		The experience level requested
+	
+	Example output:
+		5+ years professional experience in software development
+		Minimum 2 years of experience in IT/ Networking / System Administration / DevOps
+		Minimum 3 years of relevant professional experience
+		3+ years of experience writing Java APIs
+		3+ years of experience writing Java APIs
+		3+ years of Python application development
+		0-5 years of professional technical experience
+		5+ year’s experience
+		At least 4 years professional front-end development experience
+		2-4 years or more experience in TA and SA
+		5 years
+		5+ years of professional experience in engineering
+		We are looking for roughly five years of hands-on development experience 
+
+	"""	
+
+	# Subet search to description area 
+	description = str(soup.find_all(match_class(["jobsearch-JobComponent-description"])))
+	if not description:
+		return ""
+
+	description = cleanHTML(description, lowercase=True, removeNonAscii=True, cutoffFooter=True)
+
+	experienceRegex = re.compile("([0-9\-\+\s]+(?:plus)*\s{0,1})(years|year's|year)")
+	matches = experienceRegex.findall(description)
+
+	match = ""
+	if matches:
+		for m in range(len(matches)):
+			nxt = matches[m]
+			if nxt==len(matches)-1:
+				match += ''.join(nxt)
+			else:
+				match += ''.join(nxt) + ", "
+		return match
+	else: 
+		return ""
 
 
 
@@ -220,11 +313,14 @@ def extractJobInfo(jobkey, replaceDict, technologies, tor=False, port=9050):
 	# info["technologies"] = getTags(soup=soup, tags=technologies, replaceDict=replaceDict)
 	info["technologies"] = getTags(soup=soup, tags=technologies, replaceDict=replaceDict)
 	# info["degrees"] = getTags(soup=soup, tags=degrees, replaceDict=replaceDict)
+	info["title"] = getTitle(soup)
+	info["company"] = getCompany(soup)
+	info["experience"] = getExperience(soup)
 	info["jobkey"] = jobkey
 	return info
 
 
-def batchExtractJobInfo(jobkeys, replaceDict, technologies, tor=False, port=9050):
+def batchExtractJobInfo(jobkeys, replaceDict, technologies, sleepTime=5, tor=False, port=9050):
 	""" 
 
 	Args:
@@ -242,7 +338,7 @@ def batchExtractJobInfo(jobkeys, replaceDict, technologies, tor=False, port=9050
 		# Job must have a post date, and location to be usable
 		if nextJob["posted"] and nextJob["city"]:
 			info.append(nextJob)
-		time.sleep(random.choice(sleepTimes))
+		time.sleep(sleepTime)
 
 	return info
 # EOF

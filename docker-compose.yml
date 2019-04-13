@@ -9,8 +9,6 @@ services:
     image: mongo
     ports:
     - "27017:27017"
-    # volumes:
-    # - data-volume:/data/db2
 
   backend:
     build: 
@@ -28,6 +26,8 @@ services:
       - MESSAGE_QUEUE=amqp://rabbitmq
       - DATABASE_NAME=indeed
       - DB_CONNECTION_STRING=mongodb://mongo:27017/
+      - LOAD_ACTIVE_TASKS_ON_START=false
+      - MAX_TASKS_PER_USER=2
     links:
       - rabbitmq
     depends_on:
@@ -70,7 +70,12 @@ services:
       - JOB_KEYS_REGEX="jobKeysWithInfo\[\'([A-Za-z0-9]+)\'\] \="
       - DB_PORT=27017
       - TOR_PORT=9051
-      - SCRAPING_ON=False
+      - SCRAPING_ON=True
+      - SLEEP_TIME=0
+      - SLEEP_TIME_POST_TASK=0
+      - TOR_ON=False
+      # A single page typically has ~17 results...not counting duplicates
+      - PAGES_PER_SCRAPE=1
     expose:
       - "9051"
     ports:
@@ -83,27 +88,6 @@ services:
     restart: 'no'
     volumes: 
       - ./scraper:/scraper
-
-  # worker2:
-  #   build: ./scraper2
-  #   image: worker2
-  #   command: [/bin/sh , ./starter-script.sh]
-  #   environment: 
-  #     - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-  #     - DATABASE_NAME=indeed
-  #   expose:
-  #     - "9050"
-  #   ports:
-  #     - '9050:9050' 
-  #   links:
-  #     - backend
-  #   depends_on:
-  #     - rabbitmq
-  #     - backend
-  #   restart: 'no'
-  #   volumes: 
-  #     - ./scraper2:/scraper2
-
 
 volumes:
   data-volume:

@@ -16,7 +16,7 @@ from indeedScraping.util.helpers import uniqueItems, extractHTML, jsonSave, form
 # import logging
 from datetime import datetime, timedelta
 
-def extractIndeedJobSearchHTML(searchTerm, index, userAgent, tor=False, port=9050, writeLocation=None):
+def extractIndeedJobSearchHTML(searchTerm, index, userAgent, city=None, tor=False, port=9050, writeLocation=None):
 	"""
 	Wrapper around extractHTML for extract a list of jobs from an Indeed.com job search
 
@@ -31,6 +31,8 @@ def extractIndeedJobSearchHTML(searchTerm, index, userAgent, tor=False, port=905
 
 	"""
 	searchTerm = searchTerm.replace(" ", "+")
+	if city: city = city.replace(" ", "+")
+
 	urlStub = "https://www.indeed.com/jobs?q="
 
 	# TODO: IMPLEMENT GEOGRAPHIC SEARCHING
@@ -38,6 +40,9 @@ def extractIndeedJobSearchHTML(searchTerm, index, userAgent, tor=False, port=905
 
 	# Add search term
 	url = urlStub + str(searchTerm)
+	# Add city
+	if city:
+		url = url + "&l=" + city
 	# Add index of page to search
 	url += "&start=" + str(index)
 
@@ -69,7 +74,7 @@ def extractMatchesFromIndeedJobSearch(html, searchRegexEx, writeLocation=None):
 
 
 
-def batchExtractMatches(numPages, searchTerm, searchRegexEx, tor=False, port=9050, matchSingleWriteLocation=None, userAgent=None, sleepTime=None, htmlWriteLocations=None, 
+def batchExtractMatches(numPages, searchTerm, searchRegexEx, cities=None, tor=False, port=9050, matchSingleWriteLocation=None, userAgent=None, sleepTime=None, htmlWriteLocations=None, 
 					matchWriteLocations=None, pageIncrements=10):
 	"""
 
@@ -94,39 +99,42 @@ def batchExtractMatches(numPages, searchTerm, searchRegexEx, tor=False, port=905
 	# List of matches to return
 	allMatches = []
 
-	# Indeed numbers their page results in increments of 10 from 0 to 990. Draw a random selection of pages to sample
-	pageNumbers = random.sample(range(0, 1000, 10), numPages)
+	if not cities: cities = [""]
+	for city in cities:
 
-	# Extract matches for specified number of pages
-	for i in range(len(pageNumbers)):
-		index = pageNumbers[i]
-		# Extract html
-		if htmlWriteLocations:
-			nextHtmlWriteLocation = htmlWriteLocations[i]
-		else:
-			nextHtmlWriteLocation = None
+		# Indeed numbers their page results in increments of 10 from 0 to 990. Draw a random selection of pages to sample
+		pageNumbers = random.sample(range(0, 1000, 10), numPages)
 
-		if not userAgent:
-			ua = random.choice(userAgents)
+		# Extract matches for specified number of pages
+		for i in range(len(pageNumbers)):
+			index = pageNumbers[i]
+			# Extract html
+			if htmlWriteLocations:
+				nextHtmlWriteLocation = htmlWriteLocations[i]
+			else:
+				nextHtmlWriteLocation = None
 
-		html = extractIndeedJobSearchHTML(searchTerm=searchTerm, index=index, userAgent=ua, tor=tor, port=port, writeLocation=nextHtmlWriteLocation)
+			if not userAgent:
+				ua = random.choice(userAgents)
+			
+			html = extractIndeedJobSearchHTML(searchTerm=searchTerm, index=index, userAgent=ua, city=city, tor=tor, port=port, writeLocation=nextHtmlWriteLocation)
 
 
-		# Extract matches from html
-		if matchWriteLocations:
-			nextMatchWriteLocation = matchWriteLocations[i]
-		else:
-			nextMatchWriteLocation = None
+			# Extract matches from html
+			if matchWriteLocations:
+				nextMatchWriteLocation = matchWriteLocations[i]
+			else:
+				nextMatchWriteLocation = None
 
-		matches = extractMatchesFromIndeedJobSearch(html, searchRegexEx=searchRegexEx, writeLocation=nextMatchWriteLocation)
+			matches = extractMatchesFromIndeedJobSearch(html, searchRegexEx=searchRegexEx, writeLocation=nextMatchWriteLocation)
 
-		allMatches += matches
+			allMatches += matches
 
-		# Sleep random amount of time
-		if not sleepTime:
-			time.sleep(random.choice(sleepTimes))
-		else:
-			time.sleep(sleepTime)
+			# Sleep random amount of time
+			if not sleepTime:
+				time.sleep(random.choice(sleepTimes))
+			else:
+				time.sleep(sleepTime)
 
 	
 	if matchSingleWriteLocation:

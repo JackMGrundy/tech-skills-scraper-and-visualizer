@@ -1,22 +1,46 @@
 import React, { Component } from "react";
-import { Route, Redirect, Switch } from "react-router-dom";
-import authService from "./services/authService.js";
-// import logo from "./logo.svg";
-import "./App.css";
-import LoginForm from "./components/loginForm.jsx";
-import LogoutForm from "./components/logoutForm.jsx";
-import RegisterForm from "./components/registerForm.jsx";
-import EditScraperTaskForm from "./components/editScraperTasksForm.jsx";
-import ScraperTasksForm from "./components/scraperTasksForm";
-import NavBar from "./components/navBar.jsx";
-import ProtectedRoute from "./components/protectedRoute";
-import Dashboard from "./components/dashboard.jsx";
+import { Route, Switch } from "react-router-dom";
+import routes from "./routes.js";
 import { ToastContainer } from "react-toastify";
-
 import "react-toastify/dist/ReactToastify.css";
 
+import "./App.css";
+import appStyle from "./style/appStyle";
+import colors from './style/colors';
+
+import authService from "./services/authService.js";
+
+import ProtectedRoute from "./components/protectedRoute";
+import Sidebar from "./components/sidebar.jsx";
+import IconButton from "@material-ui/core/IconButton";
+import ListIcon from "@material-ui/icons/List";
+import withStyles from "@material-ui/core/styles/withStyles";
+
+const shortid = require("shortid");
+
+const switchedRoutes = (
+  <Switch>
+    {/* Generate routes according to routes.js */}
+    {routes.map(route => {
+      return route.protected ? (
+        <ProtectedRoute
+          key={shortid.generate()}
+          path={route.path}
+          component={route.component}
+        />
+      ) : (
+        <Route
+          key={shortid.generate()}
+          path={route.path}
+          component={route.component}
+        />
+      );
+    })}
+  </Switch>
+);
+
 class App extends Component {
-  state = {};
+  state = { sidebarOpen: true };
 
   componentDidMount() {
     const data = authService.getAuthData();
@@ -26,26 +50,39 @@ class App extends Component {
     }
   }
 
+  handleSidebar = () => {
+    let update = !this.state.sidebarOpen;
+    this.setState({ sidebarOpen: update });
+  };
+
+  handle = () => {
+    let update = !this.state.sidebarOpen;
+    this.setState({ sidebarOpen: update });
+  };
+
   render() {
+    document.body.style = "background:" + colors.mainBackground + ";";
+    const { classes } = this.props;
+    const { sidebarOpen } = this.state;
     return (
       <React.Fragment>
         <ToastContainer />
-        <NavBar username={this.state.username} />
-        <main className="container">
-          <Switch>
-            <Route path="/register" component={RegisterForm} />
-            <Route path="/login" component={LoginForm} />
-            <Route path="/logout" component={LogoutForm} />
-            <Route path="/dashboard" component={Dashboard} />
-            <ProtectedRoute path="/scraper" component={EditScraperTaskForm} />
-            <ProtectedRoute path="/tasks" component={ScraperTasksForm} />
-            {this.state.username && <Redirect from="/" exact to="/dashboard" />}
-            {!this.state.username && <Redirect from="/" exact to="/login" />}
-          </Switch>
-        </main>
+        {sidebarOpen ? <Sidebar open={sidebarOpen} handle={this.handle} /> : ""}
+        <div className={sidebarOpen ? classes.mainPanel : ""}>
+          {!sidebarOpen ? (
+            <IconButton
+              onClick={this.handleSidebar}
+            >
+              <ListIcon className="ml-5" style={{ transform: "scale(3)", color: colors.decoration }} />
+            </IconButton>
+          ) : (
+            ""
+          )}
+          <main className={"container"}>{switchedRoutes}</main>
+        </div>
       </React.Fragment>
     );
   }
 }
 
-export default App;
+export default withStyles(appStyle)(App);

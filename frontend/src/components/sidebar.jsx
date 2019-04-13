@@ -1,58 +1,62 @@
-import React, { Component } from "react";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import routes from "../routes.js";
 
-class Sidebar extends Component {
-  state = {};
-  render() {
-    return (
-      <div className="sidebar">
-        <nav className="sidebar-nav">
-          <ul className="nav">
-            <li className="nav-title">Nav Title</li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
-                <i className="nav-icon cui-speedometer" /> Nav item
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
-                <i className="nav-icon cui-speedometer" /> With badge
-                <span className="badge badge-primary">NEW</span>
-              </a>
-            </li>
-            <li className="nav-item nav-dropdown">
-              <a className="nav-link nav-dropdown-toggle" href="#">
-                <i className="nav-icon cui-puzzle" /> Nav dropdown
-              </a>
-              <ul className="nav-dropdown-items">
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="nav-icon cui-puzzle" /> Nav dropdown item
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">
-                    <i className="nav-icon cui-puzzle" /> Nav dropdown item
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li className="nav-item mt-auto">
-              <a className="nav-link nav-link-success" href="https://coreui.io">
-                <i className="nav-icon cui-cloud-download" /> Download CoreUI
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link nav-link-danger" href="https://coreui.io/pro/">
-                <i className="nav-icon cui-layers" /> Try CoreUI
-                <strong>PRO</strong>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <button className="sidebar-minimizer brand-minimizer" type="button" />
+// Services
+import authService from "../services/authService";
+
+// Style
+import sidebarStyle from "../style/sidebarStyle.jsx";
+import colors from '../style/colors';
+
+// Components
+import withStyles from "@material-ui/core/styles/withStyles";
+import Drawer from "@material-ui/core/Drawer";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import IconButton from "@material-ui/core/IconButton";
+import ListIcon from "@material-ui/icons/List";
+
+// Helpers
+const shortid = require("shortid");
+
+const Sidebar = ({ ...props }) => {
+  const { classes, handle } = props;
+
+  const token = authService.getToken();
+
+  return (
+    <div>
+      <div className={classes.drawerPaper}>
+        <Drawer anchor="left" variant="permanent" open>
+          <IconButton onClick={handle}>
+            <ListIcon style={{ transform: "scale(3)", color: colors.decoration }}/>
+          </IconButton>
+          <List className={classes.list}>
+            {routes.map(route => {
+              const { show } = route;
+              return (
+                <div key={shortid.generate()}>
+                  {show === "always" ||
+                  (token && show === "loggedIn") ||
+                  (!token && show === "loggedOut") ? (
+                    <NavLink to={route.path} className={classes.item}>
+                      <ListItem button className={classes.itemLink}>
+                        <ListItemText primary={route.name} />
+                      </ListItem>
+                    </NavLink>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              );
+            })}
+          </List>
+        </Drawer>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-export default Sidebar;
+export default withStyles(sidebarStyle)(Sidebar);

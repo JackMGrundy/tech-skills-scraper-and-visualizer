@@ -1,9 +1,8 @@
 {
-  "scraperServerAPIEndpoint": "http://localhost:8080/api/scraper/createTask",
-  "deleteScraperServerAPIEndpoint": "http://localhost:8080/api/scraper/deleteTask",
-  "retrieveScraperTasksAPIEndpoint": "http://localhost:8080/api/scraper/retrieveTasks",
-  "registerAPIEndpoint": "http://localhost:8080/api/register",
-  "loginAPIEndpoint": "http://localhost:8080/api/login",
+  "scrapertaskEndpoint": "http://localhost:8080/api/v1/scrapertask",
+  "dataEndpoint": "http://localhost:8080/api/v1/data",
+  "registerAPIEndpoint": "http://localhost:8080/api/v1/register",
+  "loginAPIEndpoint": "http://localhost:8080/api/v1/login",
   "toastSettings": {
     "autoClose": 2000,
     "pauseOnFocusLoss": false

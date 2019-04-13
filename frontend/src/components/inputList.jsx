@@ -64,7 +64,8 @@ class InputList extends Component {
           trigger={
               <button
                 onClick={this.handleClick}
-                className="btn btn-primary menu"
+                className="btn btn-primary btn-sm  menu"
+                tabIndex={-1}
               >
                 Aliases
               </button>
@@ -131,15 +132,17 @@ class InputList extends Component {
         ) : (
           <button
             onClick={() => helperFunctions.handleDeleteComponent(id)}
-            className="btn btn-danger menu ml-1"
+            className="btn btn-sm btn-danger menu ml-1"
+            tabIndex={-1}
           >
             -
           </button>
         )}
         <button
           onClick={this.handleClear}
-          className="btn btn-warning ml-1"
+          className="btn btn-warning btn-sm ml-1"
           type="button"
+          tabIndex={-1}
         >
           Clear aliases
         </button>
