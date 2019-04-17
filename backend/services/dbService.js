@@ -2,18 +2,44 @@ const amqp = require("amqplib");
 const winston = require("winston");
 const mongoose = require("mongoose");
 
-// Connect to DB
-console.log(
-  "Connecting to: ",
-  process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME
-);
 
-mongoose
-  .connect(process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME)
-  .then(() =>
-    console.log("Connected to Mongo. Database: ", process.env.DATABASE_NAME)
-  )
-  .catch(err => console.log("Failed to connect to Mongo: ", err));
+const options = {
+  autoIndex: false, // Don't build indexes
+  reconnectTries: 30, // Retry up to 30 times
+  reconnectInterval: 500, // Reconnect every 500ms
+  poolSize: 10, // Maintain up to 10 socket connections
+  // If not connected, return errors immediately rather than waiting for reconnect
+  bufferMaxEntries: 0
+}
+
+let connectionString = process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME;
+// connectionString = "mongodb://localhost:27017/indeed"
+
+const connectWithRetry = () => {
+console.log('MongoDB connection with retry. Connecting to: ', connectionString)
+mongoose.connect(connectionString, options).then(()=>{
+  console.log('MongoDB is connected')
+}).catch(err=>{
+  console.log('MongoDB connection unsuccessful, retry after 5 seconds.')
+  setTimeout(connectWithRetry, 5000)
+})
+}
+
+connectWithRetry()
+
+
+// Connect to DB
+// console.log(
+//   "Connecting to: ",
+//   process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME
+// );
+
+// mongoose
+//   .connect(process.env.DB_CONNECTION_STRING + process.env.DATABASE_NAME)
+//   .then(() =>
+//     console.log("Connected to Mongo. Database: ", process.env.DATABASE_NAME)
+//   )
+//   .catch(err => console.log("Failed to connect to Mongo: ", err));
 
 const scraperTaskSchema = new mongoose.Schema(
   {

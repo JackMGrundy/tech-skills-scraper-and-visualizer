@@ -433,14 +433,18 @@ class Dashboard extends Component {
           </div>
         </div>
         <br />
-        <DataTable
-          data={jobPostsTableData}
-          columns={jobPostsColumns}
-          height={400}
-          header="Job posts"
-          onRowClick={this.onRowClick}
-          footer={"Click a row to open the job post on Indeed.com"}
-        />
+        <Card>
+          <CardContent>
+            <DataTable
+              data={jobPostsTableData}
+              columns={jobPostsColumns}
+              height={400}
+              header="Job posts"
+              onRowClick={this.onRowClick}
+              footer={"Click a row to open the job post on Indeed.com"}
+            />
+          </CardContent>
+        </Card>
         <br />
         <br />
         <br />

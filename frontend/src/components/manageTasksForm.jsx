@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import tasksColumns from "./tables/tasksTable.js";
 import DataTable from "./tables/dataTable.jsx";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+
+import { ClipLoader } from "react-spinners";
+import colors from '../style/colors';
 
 const styles = theme => ({
   root: {
@@ -38,6 +43,7 @@ class ManageTasksForm extends Component {
     const { tasks } = this.props;
 
     let data = [];
+    let scraping = false;
     tasks.forEach(task => {
       let temp = {
         ...task,
@@ -52,18 +58,44 @@ class ManageTasksForm extends Component {
         controlButton: "Start/stop"
       };
       data.push(temp);
+
+      if (task.active) scraping = true;
     });
 
     return (
       <div>
-        <DataTable
-          data={data}
-          columns={tasksColumns}
-          height={201}
-          onRowClick={this.onRowClick}
-          header="Tasks"
-          footer="Click to start or stop scraping"
-        />
+        <Card>
+          <CardContent>
+            <DataTable
+              data={data}
+              columns={tasksColumns}
+              height={201}
+              onRowClick={this.onRowClick}
+              header="Tasks"
+              // footer="Click to start or stop scraping"
+            />
+            <small>
+              {data.length > 0 ? "Click to start or stop scraping" : ""}
+            </small>
+            {scraping ? (
+              <div
+                className="sweet-loading"
+                style={{
+                  float: "right"
+                }}
+              >
+                <ClipLoader
+                  sizeUnit={"px"}
+                  size={25}
+                  color={colors.decoration}
+                  loading={true}
+                />
+              </div>
+            ) : (
+              ""
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   }

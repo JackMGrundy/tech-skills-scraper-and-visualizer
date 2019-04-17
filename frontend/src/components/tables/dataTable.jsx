@@ -4,8 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import TableCell from "@material-ui/core/TableCell";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Paper from "@material-ui/core/Paper";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import { AutoSizer, Column, SortDirection, Table } from "react-virtualized";
 
 import BookmarkIcon from "@material-ui/icons/Bookmark";
@@ -198,59 +196,57 @@ class ReactVirtualizedTable extends Component {
     } = this.props;
 
     return (
-      <Card>
-        <CardContent>
-          <div className="header">
-            <br />
-            {header ? (
-              <PolymerIcon
-                style={{
-                  transform: "scale(3)",
-                  // color: "#43a047",
-                  color: colors.primary,
-                  float: "left",
-                  // width: "200px",
-                  width: "100%",
-                  height: "75px",
-                  // height: "100%",
-                  // background: "#8e8e8e",
-                  background: colors.background
-                }}
-              />
-            ) : (
-              ""
-            )}
-            <h2
-              className="mb-5"
+      <div>
+        <div className="header">
+          <br />
+          {header ? (
+            <PolymerIcon
               style={{
-                position: "relative",
-                top: "18px",
-                left: "10px",
-                color: "white"
+                transform: "scale(3)",
+                // color: "#43a047",
+                color: colors.primary,
+                float: "left",
+                // width: "200px",
+                width: "100%",
+                height: "75px",
+                // height: "100%",
+                // background: "#8e8e8e",
+                background: colors.background
               }}
-            >
-              {header}
-            </h2>{" "}
-          </div>
-          {data.length > 0 ? (
-            <Paper style={{ height: height, width: "100%" }}>
-              <WrappedVirtualizedTable
-                rowCount={data.length ? data.length : 0}
-                rowGetter={({ index }) => data[index]}
-                onRowClick={onRowClick ? event => onRowClick(event) : null}
-                onColumnClick={
-                  onColumnClick ? event => onColumnClick(event) : null
-                }
-                columns={columns}
-              />
-            </Paper>
+            />
           ) : (
             ""
           )}
-          <br />
-          <small>{data.length > 0 ? footer : ""}</small>
-        </CardContent>
-      </Card>
+          <h2
+            className="mb-5"
+            style={{
+              position: "relative",
+              top: "18px",
+              left: "10px",
+              color: "white"
+            }}
+          >
+            {header}
+          </h2>{" "}
+        </div>
+        {data.length > 0 ? (
+          <Paper style={{ height: height, width: "100%" }}>
+            <WrappedVirtualizedTable
+              rowCount={data.length ? data.length : 0}
+              rowGetter={({ index }) => data[index]}
+              onRowClick={onRowClick ? event => onRowClick(event) : null}
+              onColumnClick={
+                onColumnClick ? event => onColumnClick(event) : null
+              }
+              columns={columns}
+            />
+          </Paper>
+        ) : (
+          ""
+        )}
+        <br />
+        <small>{data.length > 0 ? footer : ""}</small>
+      </div>
     );
   }
 }

@@ -479,12 +479,12 @@ class ScraperForm extends Component {
                     />
                     {Object.keys(aliases).length > 0 ? (
                       <div>
+                        {/* <br />
                         <br />
                         <br />
                         <br />
                         <br />
-                        <br />
-                        <br />
+                        <br /> */}
                       </div>
                     ) : (
                       ""
@@ -505,7 +505,7 @@ class ScraperForm extends Component {
                     multi={selectedCities}
                     handleChange={this.handleCitySelect}
                     label="cities"
-                    height={200}
+                    height={150}
                   />
                   <button
                     onClick={this.handleSubmit}

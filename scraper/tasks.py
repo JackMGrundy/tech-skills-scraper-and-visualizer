@@ -86,7 +86,7 @@ def testTask(self, jobId):
         except:
             # Notify backend
             print("Unexpected error:", sys.exc_info()[0])
-            requests.post(completedEndPoint, json={"jobId": jobId, "status": "failed", error: sys.exc_info()[0]})
+            requests.post(completedEndPoint, json={"jobId": jobId, "status": "failed", "error": sys.exc_info()[0]})
 
     else:
         print("SCRAPING SWITCHED OFF")
