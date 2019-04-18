@@ -10,6 +10,7 @@ E) A celery process that retrieves messages from RabbitMQ and then spins up work
 Note, docker-compose.yml sets key environment variables. Notably, sleep time and whether Tor is used for requests or not.  
   
 Usage:  
+Install docker: https://docs.docker.com/v17.12/install/  
 git clone https://github.com/JackMGrundy/tech-skills-scraper-and-visualizer.git  
 navigate to frontend folder  
 docker-compose up -d --build  
