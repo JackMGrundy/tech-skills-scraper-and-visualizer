@@ -8,7 +8,9 @@ D) Aforementioned RabbitMQ message queue.
 E) A celery process that retrieves messages from RabbitMQ and then spins up worker threads that use beautiful soup to scrape indeed. Stores results in MongoDB. Will run a Tor process and direct requests through it if specified.   
 
 Note, docker-compose.yml sets key environment variables. Notably, sleep time and whether Tor is used for requests or not.  
-  
+
+Note: As of 4/18/2019, this will not install correctly. I plan to fix this by 4/20/2019. 
+
 Usage:  
 Install docker: https://docs.docker.com/v17.12/install/  
 git clone https://github.com/JackMGrundy/tech-skills-scraper-and-visualizer.git  
