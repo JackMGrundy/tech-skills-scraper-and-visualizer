@@ -29,7 +29,7 @@ E) A celery process that retrieves messages from RabbitMQ and then spins up work
   
   
 Notes:
-1) There are two separate docker-compose.yml files, one for each build option: the first is at build-from-docker-hub/docker-compose.hml and pulls images from Docker hub and the second is in the root folder.     
+1) There are two separate docker-compose.yml files, one for each build option: the first is at build-from-docker-hub/docker-compose.hml and pulls images from Docker hub, and the second is in the root folder.     
 2) The docker-compose.yml files set key environment variables that control the app. Notably:  
 a) TOR_ON: a boolean that indicates if requests will be sent through a Tor socket  
 b) SLEEP_TIME: an int that indicates how many seconds to sleep between all requests  
