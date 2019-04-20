@@ -29,7 +29,7 @@ There are 2 build options:
   
   
 Notes:
-1) There are two separate docker-compose.yml files: one at build-from-docker-hub/docker-compose.hml that pulls images from Docker hub and a second in the root folder than builds from source.   
+1) There are two separate docker-compose.yml files: one at build-from-docker-hub/docker-compose.hml that pulls images from Docker hub and a second in the root folder that builds from source.   
 2) The docker-compose.yml files set key environment variables that control the app. Notably:  
 a) TOR_ON: a boolean that indicates if requests will be sent through a Tor socket  
 b) SLEEP_TIME: an int that indicates how many seconds to sleep between all requests  
