@@ -7,20 +7,10 @@ RUN apk update && apk add \
     --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
     && rm -rf /var/cache/apk/*
 
-# Install GCC
-RUN apk add build-base
-
 # Install python 3
-RUN apk add --no-cache python3 && \
-    python3 -m ensurepip && \
-    rm -r /usr/lib/python*/ensurepip && \
-    pip3 install --upgrade pip setuptools && \
-    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
-    if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
-    rm -r /root/.cache
-
-# Install python dev
-RUN apk add python3-dev
+RUN apk add --no-cache --virtual .build-deps g++ python3-dev libffi-dev openssl-dev && \
+    apk add --no-cache --update python3 && \
+    pip3 install --upgrade pip setuptools
 
 # Install python dependencies
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 PYTHONUNBUFFERED=1
@@ -41,22 +31,3 @@ COPY torrc.default /etc/tor/torrc.default
 COPY starter-script.sh ./
 RUN chmod 777 starter-script.sh
 CMD /bin/sh  ./starter-script.sh
-
-# WORKDIR /scraper
-
-
-
-
-# Original
-# FROM python:3.6.6
-
-# ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 PYTHONUNBUFFERED=1
-
-# WORKDIR /
-
-# COPY requirements.txt ./
-# RUN pip install --no-cache-dir -r requirements.txt
-# RUN rm requirements.txt
-
-# COPY . /
-# WORKDIR /scraper

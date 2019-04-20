@@ -5,16 +5,35 @@ A) Fronted: React interface
 B) Backend: Node.js/Express. Serves two purposes: 1) Upon request from the front end, draws data from MongoDB, formats, and then sends the data back. This data is used to create a dashboard. 2) Manages a RabbitMQ message queue (see E).  
 C) Aforementioned MongoDB database  
 D) Aforementioned RabbitMQ message queue.  
-E) A celery process that retrieves messages from RabbitMQ and then spins up worker threads that use beautiful soup to scrape indeed. Stores results in MongoDB. Will run a Tor process and direct requests through it if specified.   
+E) A celery process that retrieves messages from RabbitMQ and then spins up worker threads that use beautiful soup to scrape indeed. Stores results in MongoDB. Will run a Tor process and direct requests through it if specified.     
+  
+  
+  
+There are 2 build options:  
+  
+(1) If you only want to run the application (you don't want the source code)  
+-Download build-from-docker-hub/docker-compose.yml  
+-Navigate to the folder where you downloaded docker-compose.yml  
+-Execute "Docker-compose up"  
+-Wait until everything is up and running (a few minutes to download and a few minutes to start up)  
+-Navigate to localhost:3000 in your browser  
+  
+  
+(2) If you want to play around with the source code and build new images  
+git clone https://github.com/JackMGrundy/tech-skills-scraper-and-visualizer.git     
+-Install docker: https://docs.docker.com/v17.12/install/    
+-git clone https://github.com/JackMGrundy/tech-skills-scraper-and-visualizer.git    
+-Navigate to the root folder  
+-Execute "docker-compose up --build"  
+-Open localhost:3000 in browser    
+  
+  
+  
+Notes:
+1) There are two separate docker-compose.yml files: one at build-from-docker-hub/docker-compose.hml that pulls images from Docker hub and a second in the root folder than builds from source.   
+2) The docker-compose.yml files set key environment variables that control the app. Notably:  
+a) TOR_ON: a boolean that indicates if requests will be sent through a Tor socket  
+b) SLEEP_TIME: an int that indicates how many seconds to sleep between all requests  
+c) SLEEP_TIME_POST_TASK: an int that indicates how many seconds to sleep after finishing a round of scraping  
 
-Note, docker-compose.yml sets key environment variables. Notably, sleep time and whether Tor is used for requests or not.  
-
-Note: As of 4/18/2019, this will not install correctly. I plan to fix this by 4/20/2019. 
-
-Usage:  
-Install docker: https://docs.docker.com/v17.12/install/  
-git clone https://github.com/JackMGrundy/tech-skills-scraper-and-visualizer.git  
-navigate to frontend folder  
-docker-compose up -d --build  
-docker-compose up  
-Open localhost:3000 in browser  
+3) This code is not perfect. There are many things that could be fixed up. But at this point it fulfills its basic purpose of enabling quick extraction and summarization of demand for various tech skills. I might come back to this to clean it up later. 

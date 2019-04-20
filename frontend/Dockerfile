@@ -12,9 +12,14 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
 COPY package.json /usr/src/app/package.json
-RUN npm install --silent
-RUN npm install react-scripts@1.1.1 -g --silent
-
+RUN npm install
+RUN npm install react-scripts@1.1.1 -g
+COPY public /usr/src/app/public
+COPY src /usr/src/app/src
+COPY .env.development /usr/src/app/.env.development
 
 # start app
+RUN npm install @material-ui/core
+RUN npm install @material-ui/icons
+
 CMD ["npm", "start"]

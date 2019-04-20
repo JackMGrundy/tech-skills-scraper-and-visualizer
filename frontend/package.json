@@ -31,7 +31,7 @@
     "random": "^2.1.1",
     "randomcolor": "^0.5.4",
     "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "react-dom": "^16.8.6",
     "react-heatmap-grid": "^0.8.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.8",

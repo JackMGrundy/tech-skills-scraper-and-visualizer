@@ -11,7 +11,7 @@ COPY package*.json ./
 VOLUME [ "/usr/src/app" ]
 
 RUN npm install
-RUN npm install -g nodemon
+# RUN npm install -g nodemon
 RUN npm install express-async-errors
 
 # For production
@@ -20,5 +20,5 @@ RUN npm install express-async-errors
 # Bundle app source
 COPY . .
 
-# EXPOSE 3000
-CMD [ "nodemon", "-L", "app.js" ]
+# CMD [ "nodemon", "-L", "app.js" ]
+CMD [ "node", "app.js" ]

@@ -11,17 +11,12 @@ services:
     - "27017:27017"
 
   backend:
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+    image: jackmgrundy/tech-skills-scraper-and-visualizer_backend
     working_dir: /usr/src/app
     expose:
       - "8080"
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend:/usr/src/app
-      - ./backend:/app
     environment:
       - MESSAGE_QUEUE=amqp://rabbitmq
       - DATABASE_NAME=indeed
@@ -36,9 +31,7 @@ services:
     - rabbitmq
 
   frontend:
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: jackmgrundy/tech-skills-scraper-and-visualizer_frontend
     environment:
       - NODE_ENV=development
     expose:
@@ -52,9 +45,9 @@ services:
     - backend
     - mongo
 
+
   worker:
-    build: ./scraper
-    image: worker
+    image: jackmgrundy/worker
     command: [/bin/sh , ./starter-script.sh]
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
@@ -68,7 +61,7 @@ services:
       - TOR_ON=True
       - PAGES_PER_SCRAPE=3
     expose:
-      - "9051"
+      - '9051'
     ports:
       - '9051:9051' 
     links:
