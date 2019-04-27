@@ -58,7 +58,7 @@ services:
       - SCRAPING_ON=True
       - SLEEP_TIME=0
       - SLEEP_TIME_POST_TASK=0
-      - TOR_ON=True
+      - TOR_ON=False
       - PAGES_PER_SCRAPE=3
     expose:
       - '9051'

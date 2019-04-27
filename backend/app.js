@@ -20,7 +20,7 @@ process.on("uncaughtException", ex => {
 });
 
 // Logging
-winston.add(winston.transports.File, { filename: "logfile.log" });
+// winston.add(winston.transports.File, { filename: "logfile.log" });
 
 // Middleware
 app.use(whitelist);
