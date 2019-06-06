@@ -18,7 +18,7 @@ There are 2 build options:
 -Open localhost:3000 in browser    
   
   
-Details:  
+Architecture:  
 Components include:  
 A) Fronted: React interface  
 B) Backend: Node.js/Express. Serves two purposes: 1) Upon request from the front end, draws data from MongoDB, formats, and then sends the data back. This data is used to create a dashboard. 2) Manages a RabbitMQ message queue (see E).  
