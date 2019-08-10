@@ -13,7 +13,7 @@ There are 2 build options:
 (2) If you want to play around with the source code and build new images  
 -install docker: https://docs.docker.com/v17.12/install/   
 -git clone https://github.com/JackMGrundy/tech-skills-scraper-and-visualizer.git           
--Navigate to the root folder tech-skills-scraper-and-visualizer  
+-Navigate to /tech-skills-scraper-and-visualizer/frontend  
 -Execute "docker-compose up --build"  
 -Open localhost:3000 in browser    
   
