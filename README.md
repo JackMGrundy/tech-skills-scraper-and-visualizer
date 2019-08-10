@@ -35,4 +35,4 @@ a) TOR_ON: a boolean that indicates if requests will be sent through a Tor socke
 b) SLEEP_TIME: an int that indicates how many seconds to sleep between all requests  
 c) SLEEP_TIME_POST_TASK: an int that indicates how many seconds to sleep after finishing a round of scraping  
 
-3) This code is not perfect. There are many improvements to be made, but it fulfills its purpose of enabling quick extraction and summarization of demand for various tech skills. I might clean this up later. 
+3) This code is very far from perfect. There are many improvements to be made, but it fulfills its purpose of enabling quick extraction and summarization of demand for various tech skills. I might clean this up later. 
