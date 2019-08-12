@@ -1,3 +1,8 @@
+Please note:
+This code is a "ball of mud" I put together for a relatively quick proof of concept. There are a huge number of improvements (in terms of architecture, code quality, etc.) to be made. I am in the process of making a web application built on this concept. 
+
+
+
 This application can be used to scrape data about what skills are being demanded for different jobs in different US cities. See https://medium.com/@jackgrundy/automatically-compiling-data-from-indeed-com-about-what-tech-skills-are-in-demand-7be6e9ecd0f1 for an illustration.  
   
 There are 2 build options:  
@@ -34,5 +39,3 @@ Notes:
 a) TOR_ON: a boolean that indicates if requests will be sent through a Tor socket  
 b) SLEEP_TIME: an int that indicates how many seconds to sleep between all requests  
 c) SLEEP_TIME_POST_TASK: an int that indicates how many seconds to sleep after finishing a round of scraping  
-
-3) This code is intended as a quick proof of concept. There are a huge number of improvements (in terms of architecture, code quality, etc.) to be made. I am planning on creating a web application from this concept. 
