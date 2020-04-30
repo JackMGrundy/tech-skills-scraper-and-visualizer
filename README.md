@@ -1,5 +1,5 @@
 Please note:
-This code is a "ball of mud" I put together for a relatively quick proof of concept. There are a huge number of improvements (in terms of architecture, code quality, etc.) to be made. I am in the process of making a web application built on this concept. 
+This code is a "ball of mud" I put together for a relatively quick proof of concept. There are a huge number of improvements (in terms of architecture, code quality, etc.) to be made. Maybe one day I'll actually turn this into a web application ¯\_(ツ)_/¯.
 
 
 
