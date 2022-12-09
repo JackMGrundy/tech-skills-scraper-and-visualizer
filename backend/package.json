@@ -12,7 +12,7 @@
     "amqp": "^0.2.7",
     "amqplib": "^0.5.3",
     "config": "^3.0.1",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
